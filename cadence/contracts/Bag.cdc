@@ -1,37 +1,42 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import Background from "./traits/Background.cdc"
-import Types from "./traits/Type.cdc"
-import Cloth from "./traits/Cloth.cdc"
-import Weapon from "./traits/Weapon.cdc"
-import Necklace from "./traits/Necklace.cdc"
-import Ring from "./traits/Ring.cdc"
-import Helmet from "./traits/Helmet.cdc"
-import Rarity from "./traits/Rarity.cdc"
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import FungibleToken from 0x9a0766d93b6608b7
+import FlowToken from 0x7e60df042a9c0868
+import MetadataViews from 0x631e88ae7f1d7c20
+import ViewResolver from 0x631e88ae7f1d7c20
+import Background from 0x07106009be51ec25
+import Types from 0x07106009be51ec25
+import Cloth from 0x07106009be51ec25
+import Weapon from 0x07106009be51ec25
+import Necklace from 0x07106009be51ec25
+import Ring from 0x07106009be51ec25
+import Helmet from 0x07106009be51ec25
+import Rarity from 0x07106009be51ec25
+import Base64 from 0x07106009be51ec25
 
-pub contract Bag: NonFungibleToken {
+pub contract Bag: NonFungibleToken, ViewResolver {
 
-    // State Variable
-    pub var totalSupply: UInt64
-    pub var maxSupply: UInt64
-    pub let bagPrice: UFix64
-    pub var bagsRarityScore: {UInt64: UInt64} 
-
-    // Event
     pub event ContractInitialized()
     pub event Withdraw(id: UInt64, from: Address?)
     pub event Deposit(id: UInt64, to: Address?)
+    pub event Minted(id: UInt64, svg:String)
 
     // Storage and Public Paths
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPublicPath: PublicPath
 
+    // State Variable
+    pub var totalSupply: UInt64
+    pub var maxSupply: UInt64
+    pub let bagPrice: UFix64
+
+    pub var bagsRarityScore: {UInt64: UInt64} 
+
     // The core resource that represents a Non Fungible Token.
-    pub resource NFT: NonFungibleToken.INFT {
+    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
         pub let id: UInt64
         pub let svg: String
 
-        init(id: UInt64,svg: String) 
+        init(id: UInt64, svg: String) 
         {
             self.id = id
             self.svg = svg
@@ -44,23 +49,114 @@ pub contract Bag: NonFungibleToken {
         pub fun getSVG(): String{
             return self.svg
         }
-        
-    }
 
-    pub resource interface ExampleNFTCollectionPublic {
+        pub fun getViews(): [Type] {
+            return [
+                Type<MetadataViews.Display>(),
+                Type<MetadataViews.Editions>(),
+                Type<MetadataViews.ExternalURL>(),
+                Type<MetadataViews.NFTCollectionData>(),
+                Type<MetadataViews.NFTCollectionDisplay>(),
+                Type<MetadataViews.Royalties>(),
+                Type<MetadataViews.Traits>()
+            ]
+        }
+
+        pub fun resolveView(_ view: Type): AnyStruct? {
+            // Note: This needs to be changed for each environment before deployment
+            switch view {
+                case Type<MetadataViews.Display>():
+                    return MetadataViews.Display(
+                        name: "Bag # ".concat(self.id.toString()),
+                        description: "The on-chain randomized bag utilizes flow VRF to generate unique characters.",
+                        thumbnail: MetadataViews.HTTPFile(url: self.getSVG()
+                            //url: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHByZXNlcnZlQXNwZWN0UmF0aW89J3hNaW5ZTWluIG1lZXQnIHZpZXdCb3g9JzAgMCAzNTAgMzUwJz48c3R5bGU+LmJhZyB7IGZpbGw6IHdoaXRlOyBmb250LWZhbWlseTogc2VyaWY7IGZvbnQtc2l6ZTogMTRweDsgZm9udC13ZWlnaHQ6IGJvbGR9IC5iYXNlIHsgZmlsbDogd2hpdGU7IGZvbnQtZmFtaWx5OiBzZXJpZjsgZm9udC1zaXplOiAxNHB4OyB9IC50aXRsZSB7IGZpbGw6ICNkZGQ7IGZvbnQtZmFtaWx5OiBCb29rbWFuOyBmb250LXNpemU6IDEwcHg7IHRleHQtYW5jaG9yOiBtaWRkbGU7IH08L3N0eWxlPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbGw9J2JsYWNrJyAvPjx0ZXh0IHg9JzE3NScgeT0nMzQwJyBjbGFzcz0ndGl0bGUnPmJ1aWxkLW9uLWZsb3c8L3RleHQ+PHRleHQgeD0nMTAnIHk9JzIwJyBjbGFzcz0nYmFnJz5iYWcgIzY8L3RleHQ+PHRleHQgeD0nMTAnIHk9JzYwJyBjbGFzcz0nYmFzZSc+VGVhbCBTZXJlbml0eTwvdGV4dD48dGV4dCB4PScxMCcgeT0nODAnIGNsYXNzPSdiYXNlJz5JbmZlY3RlZCBTdXJ2aXZvcjwvdGV4dD48dGV4dCB4PScxMCcgeT0nMTAwJyBjbGFzcz0nYmFzZSc+UmFkaWF0aW9uLVByb29mIEp1bXBzdWl0PC90ZXh0Pjx0ZXh0IHg9JzEwJyB5PScxMjAnIGNsYXNzPSdiYXNlJz5CbGF6ZTwvdGV4dD48dGV4dCB4PScxMCcgeT0nMTQwJyBjbGFzcz0nYmFzZSc+QW11bGV0PC90ZXh0Pjx0ZXh0IHg9JzEwJyB5PScxNjAnIGNsYXNzPSdiYXNlJz5Hb2xkIFJpbmc8L3RleHQ+PHRleHQgeD0nMTAnIHk9JzE4MCcgY2xhc3M9J2Jhc2UnPlBvd2VyIEFybW9yIEhlbG1ldDwvdGV4dD48dGV4dCB4PScxMCcgeT0nMjUwJyBjbGFzcz0nYmFzZSc+cmFyaXR5IHNjb3JlOiAxNjwvdGV4dD48L3N2Zz4K"
+                        )
+                    )
+
+                case Type<MetadataViews.Edition>():
+                    return MetadataViews.Edition(
+                      name: "Bag",
+                      number: self.id,
+                      max: Bag.maxSupply
+                    )
+
+                case Type<MetadataViews.Editions>():
+                    let editionInfo = MetadataViews.Edition(name: "Bag Edition", number: self.id, max: Bag.maxSupply)
+                    let editionList: [MetadataViews.Edition] = [editionInfo]
+                    return MetadataViews.Editions(
+                        editionList
+                    )
+
+                case Type<MetadataViews.ExternalURL>():
+                    return MetadataViews.ExternalURL(
+                            url: "https://xyz.io/"
+                    )
+
+                case Type<MetadataViews.NFTCollectionData>():
+                    return MetadataViews.NFTCollectionData(
+                        storagePath: Bag.CollectionStoragePath,
+                        publicPath: Bag.CollectionPublicPath,
+                        providerPath: /private/BagNFTCollection,
+                        publicCollection: Type<&Bag.Collection{Bag.BagNFTCollectionPulbic}>(),
+                        publicLinkedType: Type<&Bag.Collection{Bag.BagNFTCollectionPulbic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+                        providerLinkedType: Type<&Bag.Collection{Bag.BagNFTCollectionPulbic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
+                            return <-Bag.createEmptyCollection()
+                        })
+                    )
+
+                case Type<MetadataViews.NFTCollectionDisplay>():
+                    let media = MetadataViews.Media(
+                                    file: MetadataViews.HTTPFile(
+                                    url: "https://storage/123.png"
+                                ),
+                                mediaType: "image/png"
+                                )
+                    return MetadataViews.NFTCollectionDisplay(
+                        name: "Bag",
+                        description: "The on-chain randomized bag utilizes flow VRF to generate unique characters.",
+                        externalURL: MetadataViews.ExternalURL("https://p.io/"),
+                        squareImage: media,
+                        bannerImage: media,
+                        socials: {
+                            "twitter": MetadataViews.ExternalURL("https://twitter.com/d")
+                        }
+                    )
+
+                case Type<MetadataViews.Royalties>():
+                    let merchant = getAccount(0xf1d3e3f8e9788ea7)
+                    return MetadataViews.Royalties(
+                            cutInfos: [
+                                MetadataViews.Royalty(
+                                    recepient: merchant.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+                                    cut: 0.01,
+                                    description: "Bag creator royalty in Flow Token",
+                                )
+                            ]
+                )
+
+                case Type<MetadataViews.Serial>():
+                    return MetadataViews.Serial(
+                        self.id
+                )
+            }
+
+            return nil
+        }  
+    }
+    pub resource interface BagNFTCollectionPulbic {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowExampleNFT(id: UInt64): &Bag.NFT? {
+        pub fun borrowBagNFT(id: UInt64): &Bag.NFT? {
             post {
                 (result == nil) || (result?.id == id):
-                    "Cannot borrow Bag reference: the ID of the returned reference is incorrect"
+                    "Cannot borrow Bag reference: The ID of the returned reference is incorrect"
             }
         }
     }
-
-    // The resource that will be holding the NFTs inside any account.
-    pub resource Collection: ExampleNFTCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+    pub resource Collection: BagNFTCollectionPulbic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         init () {
@@ -85,6 +181,14 @@ pub contract Bag: NonFungibleToken {
             destroy oldToken
         }
 
+        pub fun batchDeposit(collection: @Collection) {
+            let keys = collection.getIDs()
+            for key in keys {
+                self.deposit(token: <-collection.withdraw(withdrawID: key))
+            }
+            destroy collection
+        }
+
         pub fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
@@ -93,13 +197,18 @@ pub contract Bag: NonFungibleToken {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
-        pub fun borrowExampleNFT(id: UInt64): &Bag.NFT? {
+        pub fun borrowBagNFT(id: UInt64): &Bag.NFT? {
             if self.ownedNFTs[id] != nil {
                 let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
                 return ref as! &Bag.NFT
             }
-
             return nil
+        }
+
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+            let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let bagNFT = ref as! &Bag.NFT
+            return bagNFT as &AnyResource{MetadataViews.Resolver}
         }
     }
 
@@ -221,17 +330,79 @@ pub contract Bag: NonFungibleToken {
         return svg
     }
 
-    pub fun mintNFT(): @Bag.NFT {
+    pub fun mintNFT(payment: @FlowToken.Vault): @Bag.NFT {
         pre {
             self.totalSupply != self.maxSupply : "There are no NFTs left."
-            //vault.balance == Bag.bagPrice : "You don't have enough FLOW."
+            payment.balance == Bag.bagPrice : "You don't have enough FLOW."
         }
+        let contractReceiverRef: &FlowToken.Vault{FungibleToken.Receiver} = Bag.account.getCapability(/public/flowTokenReceiver).borrow<&FlowToken.Vault{FungibleToken.Receiver}>()!
+        contractReceiverRef.deposit(from: <- payment)
         Bag.totalSupply = Bag.totalSupply + 1
-        var svg = Bag.generateSVG()
-        var newNFT <- create NFT(id: Bag.totalSupply,svg: svg)
+        var image = Bag.generateSVG()
+        var svgToBase64 = Bag.convertSVG(url: image)
+        var newSVG = "data:image/svg+xml;base64,".concat(svgToBase64)
+        var newNFT <- create NFT(id: Bag.totalSupply,svg: newSVG)
+        emit Minted(id: newNFT.id, svg: newNFT.svg)
         return <- newNFT
     }
 
+    pub fun convertStringToBytes(input: String): [UInt8] {
+        return input.utf8
+    }
+
+    pub fun convertSVG(url:String): String {
+        var image = Bag.convertStringToBytes(input: url)
+        return Base64.encode(data: image)
+    }
+    
+    pub fun getViews(): [Type] {
+        return [
+            Type<MetadataViews.ExternalURL>(),
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+        pub fun resolveView(_ view: Type): AnyStruct? {
+        switch view {
+            case Type<MetadataViews.ExternalURL>():
+                    return MetadataViews.ExternalURL(
+                            url: "https://xyz.io/"
+                    )
+
+                case Type<MetadataViews.NFTCollectionData>():
+                    return MetadataViews.NFTCollectionData(
+                        storagePath: Bag.CollectionStoragePath,
+                        publicPath: Bag.CollectionPublicPath,
+                        providerPath: /private/BagNFTCollection,
+                        publicCollection: Type<&Bag.Collection{Bag.BagNFTCollectionPulbic}>(),
+                        publicLinkedType: Type<&Bag.Collection{Bag.BagNFTCollectionPulbic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+                        providerLinkedType: Type<&Bag.Collection{Bag.BagNFTCollectionPulbic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
+                            return <-Bag.createEmptyCollection()
+                        })
+                    )
+
+                case Type<MetadataViews.NFTCollectionDisplay>():
+                    let media = MetadataViews.Media(
+                                    file: MetadataViews.HTTPFile(
+                                    url: "https://storage/123.png"
+                                ),
+                                mediaType: "image/png"
+                                )
+                    return MetadataViews.NFTCollectionDisplay(
+                        name: "Bag",
+                        description: "The on-chain randomized bag utilizes flow VRF to generate unique characters.",
+                        externalURL: MetadataViews.ExternalURL("https://p.io/"),
+                        squareImage: media,
+                        bannerImage: media,
+                        socials: {
+                            "twitter": MetadataViews.ExternalURL("https://twitter.com/d")
+                        }
+                    )
+        }
+        return nil
+    }
 
     init() {
         self.totalSupply = 0
@@ -239,16 +410,13 @@ pub contract Bag: NonFungibleToken {
         self.bagPrice = 30.0
         self.bagsRarityScore = {}
 
-        self.CollectionStoragePath = /storage/exampleNFTCollection
-        self.CollectionPublicPath = /public/exampleNFTCollection
+        self.CollectionStoragePath = /storage/BagNFTCollection
+        self.CollectionPublicPath = /public/BagNFTCollection
 
         let collection <- create Collection()
         self.account.save(<-collection, to: self.CollectionStoragePath)
 
-        self.account.link<&Bag.Collection{NonFungibleToken.CollectionPublic, Bag.ExampleNFTCollectionPublic}>(
-            self.CollectionPublicPath,
-            target: self.CollectionStoragePath
-        )
+        self.account.link<&Bag.Collection{NonFungibleToken.CollectionPublic, Bag.BagNFTCollectionPulbic}>(self.CollectionPublicPath,target: self.CollectionStoragePath)
 
         emit ContractInitialized()
     }
