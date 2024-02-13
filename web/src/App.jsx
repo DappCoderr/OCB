@@ -1,8 +1,12 @@
-import { useState } from "react";
 import "./App.css";
+import LandingPage from "./component/LandingPage";
 
 function App() {
-  return <div>TheBag_</div>;
+  return (
+    <div>
+      <LandingPage />
+    </div>
+  );
 }
 
 export default App;
