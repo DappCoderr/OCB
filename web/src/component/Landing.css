@@ -14,6 +14,11 @@
 header {
   height: 80px;
 }
+
+pre {
+  font-size: 18px;
+}
+
 .logo {
   margin-top: 32px;
   margin-left: 44px;
@@ -21,16 +26,22 @@ header {
   font-weight: bolder;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
+
 main {
-}
-footer {
-  height: 120px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-right: auto;
+  margin-left: auto;
 }
 
-img {
+main p {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+/* img {
   width: 300px;
   height: 300px;
   border: white 2px solid;
@@ -42,4 +53,11 @@ img {
   flex-wrap: wrap;
   gap: 40px;
   justify-content: center;
+} */
+
+footer {
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

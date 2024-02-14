@@ -1,33 +1,28 @@
-import React from "react";
-import bag from "../assets/bag.svg";
+// import bag from "../assets/bag.svg";
 import "./Landing.css";
 
 const LandingPage = () => {
+  const mainTitle = `
+  bag is an pioneering on-chain avatar box, and the first nft project
+  utilizing flow VRF. Explore 4444 unique nfts available for purchase on Flow!!
+  
+  Launching Soon....
+  `;
+
+  const footerTitle = `
+  Build on Flow
+  `;
+
   return (
     <div className="landing_page">
       <header>
         <div className="logo">bag_</div>
       </header>
       <main>
-        <div className="content">
-          <p>
-            bag is a first every randomize gear box NFT completely on-chian and
-            also a first every NFT project using Flow VRF. There are total 4444
-            nft for sale.
-          </p>
-          <p>Launching Soon....</p>
-        </div>
-        <div className="image_wrapper">
-          <img src={bag} />
-          <img src={bag} />
-          <img src={bag} />
-        </div>
+        <pre dangerouslySetInnerHTML={{ __html: mainTitle }} />
       </main>
       <footer>
-        <section>
-          <div>Build on Flow</div>
-          <div>Flow Logo</div>
-        </section>
+        <pre dangerouslySetInnerHTML={{ __html: footerTitle }} />
       </footer>
     </div>
   );
