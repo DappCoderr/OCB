@@ -2,28 +2,20 @@
 import "./Landing.css";
 
 const LandingPage = () => {
-  const mainTitle = `
-  bag is an pioneering on-chain avatar box, and the first nft project
-  utilizing flow VRF. Explore 4444 unique nfts available for purchase on Flow!!
-  
-  Launching Soon....
-  `;
-
-  const footerTitle = `
-  Build on Flow
-  `;
-
   return (
     <div className="landing_page">
-      <header>
-        <div className="logo">bag_</div>
-      </header>
-      <main>
-        <pre dangerouslySetInnerHTML={{ __html: mainTitle }} />
-      </main>
-      <footer>
-        <pre dangerouslySetInnerHTML={{ __html: footerTitle }} />
-      </footer>
+      <h1>bag_</h1>
+      <p>
+        bag is an pioneering on-chain avatar box, including weapons, helmet,
+        ring, cloth & necklace etc. Bag will be the first nft project utilizing
+        flow VRF with total 4444 unique nfts on flow!!
+      </p>
+      <p>Launching Soon...</p>
+      <p className="links">
+        <a href="#">twitter</a>
+        <a href="#">flow_scan</a>
+        <a href="#">view</a>
+      </p>
     </div>
   );
 };
