@@ -1,5 +1,6 @@
 import bag from "../assets/bag.svg";
 import Countdown from "./Countdown";
+import { Link } from "react-router-dom";
 
 const LandingPage = () => {
   const targetDate = new Date(2024, 4, 30).getTime();
@@ -11,15 +12,22 @@ const LandingPage = () => {
         </h1>
         <div className="col-span-3"></div>
         <div className="col-span-3 flex justify-end items-center">
-          <p className="cursor-pointer font-bold mr-6 hover:text-gray-400">
-            Faq
-          </p>
-          <p className="cursor-pointer font-bold hover:text-gray-400">X</p>
+          <Link to="/faq">
+            <p className="cursor-pointer font-bold mr-6 hover:text-gray-400">
+              Faq
+            </p>
+          </Link>
+          <Link to={"https://twitter.com/flow_blockchain"}>
+            <p className="cursor-pointer font-bold hover:text-gray-400">X</p>
+          </Link>
         </div>
       </header>
       <div className="flex flex-col items-center text-4xl font-bold my-8">
-        <div className="text-center text-4xl sm:flex sm:flex-col sm:items-center sm:text-8xl">
-          <Countdown targetDate={targetDate} />
+        <div className="text-center text-2xl sm:flex sm:flex-col sm:items-center sm:text-4xl">
+          <p className="text-2xl mb-8">Project Launch Countdown</p>
+          <div className="border-2 border-dashed border-white px-5 py-3">
+            <Countdown targetDate={targetDate} />
+          </div>
         </div>
       </div>
       <div className="flex flex-wrap justify-center gap-5">

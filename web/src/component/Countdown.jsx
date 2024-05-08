@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Countdown = ({ targetDate }) => {
   const calculateTimeLeft = () => {
@@ -31,18 +31,6 @@ const Countdown = ({ targetDate }) => {
     <div>
       {timeLeft.days} : {timeLeft.hours} : {timeLeft.minutes} :{" "}
       {timeLeft.seconds}
-    </div>
-  );
-};
-
-const LaunchCountdown = () => {
-  // Set the target launch date to May 30th, 2024
-  const targetDate = new Date(2024, 4, 30).getTime();
-
-  return (
-    <div>
-      <h1>Project Launch Countdown</h1>
-      <Countdown targetDate={targetDate} />
     </div>
   );
 };
