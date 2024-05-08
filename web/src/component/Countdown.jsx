@@ -28,7 +28,7 @@ const Countdown = ({ targetDate }) => {
   });
 
   return (
-    <div className="text-6xl">
+    <div>
       {timeLeft.days} : {timeLeft.hours} : {timeLeft.minutes} :{" "}
       {timeLeft.seconds}
     </div>
