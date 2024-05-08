@@ -5,12 +5,12 @@ import { Link } from "react-router-dom";
 const LandingPage = () => {
   const targetDate = new Date(2024, 4, 30).getTime();
   return (
-    <div className="grid place-items-center bg-black text-white min-h-screen p-8 sm:pl-16 sm:pr-16">
+    <div className="grid place-items-center bg-[#090909] text-[#F5F5F5] min-h-screen p-8 sm:pl-16 sm:pr-16">
       <header className="grid w-full h-16 grid-cols-9 items-center">
         <h1 className="col-span-3 justify-self-start font-bold text-3xl font-serif">
           bag
           <Link
-            className=" ml-6 hover:bg-black hover:text-white mb-10 bg-white text-black px-6 py-2 rounded-md text-sm"
+            className="ml-6 hover:bg-black hover:text-[#F5F5F5] mb-10 bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
             to={"https://forms.gle/JHWcAdNkyKbf4jTR6"}
           >
             Join Waitlist
@@ -44,7 +44,7 @@ const LandingPage = () => {
       <div className="flex flex-wrap justify-center gap-5">
         <div className="flex flex-col text-center">
           <img
-            className="w-72 h-72 border-2 border-slate-300 rounded-lg hover:border-gray-400 transition duration-300"
+            className="w-72 h-72 border border-[#f5f5f5c4] rounded-lg hover:border-gray-400 transition duration-300"
             src={bag}
             alt=""
           />
@@ -52,7 +52,7 @@ const LandingPage = () => {
         </div>
         <div className="flex flex-col text-center">
           <img
-            className="w-72 h-72 border-2 border-slate-300 rounded-lg hover:border-gray-400 transition duration-300"
+            className="w-72 h-72 border border-[#f5f5f5c4] rounded-md hover:border-gray-400 transition duration-300"
             src={bag}
             alt=""
           />
@@ -60,7 +60,7 @@ const LandingPage = () => {
         </div>
         <div className="flex flex-col text-center">
           <img
-            className="w-72 h-72 border-2 border-slate-300 rounded-lg hover:border-gray-400 transition duration-300"
+            className="w-72 h-72 border border-[#f5f5f5c4] rounded-lg hover:border-gray-400 transition duration-300"
             src={bag}
             alt=""
           />
