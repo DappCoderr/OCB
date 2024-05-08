@@ -9,7 +9,14 @@ const LandingPage = () => {
       <header className="grid w-full h-16 grid-cols-9 items-center">
         <h1 className="col-span-3 justify-self-start font-bold text-3xl font-serif">
           bag
+          <Link
+            className=" ml-6 hover:bg-black hover:text-white mb-10 bg-white text-black px-6 py-2 rounded-md text-sm"
+            to={"https://forms.gle/JHWcAdNkyKbf4jTR6"}
+          >
+            Join Waitlist
+          </Link>
         </h1>
+
         <div className="col-span-3"></div>
         <div className="col-span-3 flex justify-end items-center font-serif">
           <Link to="/faq">
@@ -18,7 +25,7 @@ const LandingPage = () => {
             </p>
           </Link>
           <a
-            href="https://twitter.com/flow_blockchain"
+            href="https://twitter.com/onchainbag"
             target="_blank"
             rel="noopener noreferrer"
           >

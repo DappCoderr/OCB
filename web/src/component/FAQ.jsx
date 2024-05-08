@@ -6,24 +6,19 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: "What is bag_?",
+      question: "What is bag?",
       answer:
-        "The Bag is an adventure items inspired by the Loot Project. Each bag includes 8 items to build a distinctive avatar that tells its own stories, providing unique experiences and opening up possibilities for future gaming.",
+        "Bag is a collection of digital gear, inspired by the Loot Project.  Each Bag contains 8 unique pieces, like a randomized treasure chest for your avatar. Build a one-of-a-kind character that speaks volumes about your adventures. It's more than just looks - Bag opens the door to future games, letting you bring your customized avatar to life.",
     },
     {
       question: "Is the bag fully on-chain?",
       answer:
-        "Yes, The Bag is a fully on-chain generative and randomised NFT, thanks to Flow VRF.",
-    },
-    {
-      question: "How do we purchase the bag, and what is its price?",
-      answer:
-        "To purchase Bag, you need Flow Tokens, and each bag costs 60 Flow.",
+        "Absolutely! Bag is a fully on-chain experience. From the generation and randomization (thanks to Flow VRF) of your gear to the items themselves, everything is stored securely on the blockchain",
     },
     {
       question: "How is bag rarity defined?",
       answer:
-        "Each bag has a rarity score generated on-chain, determining its value and uniqueness.",
+        "Bag rarity combines individual item scores on-chain to define the uniqueness of your entire adventurer's gear collection.",
     },
     {
       question: "How many bags can one user mint?",
@@ -31,7 +26,7 @@ const FAQ = () => {
     },
     {
       question: "Total Supply of Bag NFT?",
-      answer: "There will be a total of 8888 NFT.",
+      answer: "There will be a total of 6666 NFT.",
     },
   ];
 
