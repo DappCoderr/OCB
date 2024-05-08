@@ -5,12 +5,12 @@ import { Link } from "react-router-dom";
 const LandingPage = () => {
   const targetDate = new Date(2024, 4, 30).getTime();
   return (
-    <div className="grid place-items-center bg-[#090909] text-[#F5F5F5] min-h-screen p-8 sm:pl-16 sm:pr-16">
+    <div className="grid place-items-center bg-[#000000] text-[#F5F5F5] min-h-screen p-8 sm:pl-16 sm:pr-16">
       <header className="grid w-full h-16 grid-cols-9 items-center">
-        <h1 className="col-span-3 justify-self-start font-bold text-3xl font-serif">
+        <h1 className="col-span-3 justify-self-start font-bold text-md sm:text-3xl font-serif">
           bag
           <Link
-            className="ml-6 hover:bg-black hover:text-[#F5F5F5] mb-10 bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
+            className="ml-6 hover:bg-black hover:text-[#F5F5F5] bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
             to={"https://forms.gle/JHWcAdNkyKbf4jTR6"}
           >
             Join Waitlist
