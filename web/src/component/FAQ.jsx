@@ -41,7 +41,8 @@ const FAQ = () => {
 
   return (
     <>
-      <div className="w-full max-w-md mx-auto mt-8 bg-black text-white p-4 rounded-lg">
+      <div className=" w-screen min-h-screen bg-black text-white p-4 sm:w-full sm:max-w-xl sm:text-black sm:bg-white sm:mx-auto sm:pt-8">
+        <h1 className="text-center mb-4 font-bold">FAQ</h1>
         {faqs.map((faq, index) => (
           <div key={index} className="border-b border-gray-200">
             <button
@@ -67,15 +68,12 @@ const FAQ = () => {
             {openIndex === index && <p className="py-3 px-4">{faq.answer}</p>}
           </div>
         ))}
-      </div>
-      <div>
         <Link
           to="/"
-          className="text-black font-bold mb-4 block text-center mt-20"
+          className="text-white font-bold mt-14 block text-center sm:text-black"
         >
           🔙 Home
         </Link>{" "}
-        {/* Home button */}
       </div>
     </>
   );
