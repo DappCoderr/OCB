@@ -16,6 +16,11 @@ const FAQ = () => {
         "Absolutely! Bag is a fully on-chain experience. From the generation and randomization (thanks to Flow VRF) of your gear to the items themselves, everything is stored securely on the blockchain",
     },
     {
+      question: "How do we trust Bag?",
+      answer:
+        "Bag is fully onchain, generation of NFTs and transaction are trackable. Anyone can view the contract.",
+    },
+    {
       question: "How is bag rarity defined?",
       answer:
         "Bag rarity combines individual item scores on-chain to define the uniqueness of your entire adventurer's gear collection.",
@@ -27,6 +32,11 @@ const FAQ = () => {
     {
       question: "Total Supply of Bag NFT?",
       answer: "There will be a total of 6666 NFT.",
+    },
+    {
+      question: "Who is behind Bag Project?",
+      answer:
+        "This project is made for the degen community by the degen community member to bring some fun.",
     },
   ];
 

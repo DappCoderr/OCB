@@ -3,7 +3,7 @@ import Countdown from "./Countdown";
 import { Link } from "react-router-dom";
 
 const LandingPage = () => {
-  const targetDate = new Date(2024, 4, 30).getTime();
+  const targetDate = new Date(2024, 5, 9).getTime();
   return (
     <div className="grid place-items-center bg-[#000000] text-[#F5F5F5] min-h-screen p-8 sm:pl-16 sm:pr-16">
       <header className="grid w-full h-16 grid-cols-9 items-center">
@@ -11,7 +11,7 @@ const LandingPage = () => {
           bag
           <Link
             className="ml-6 hover:bg-black hover:text-[#F5F5F5] bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
-            to={"https://forms.gle/JHWcAdNkyKbf4jTR6"}
+            to={"https://tally.so/r/nr6Dkp"}
           >
             Join Waitlist
           </Link>
