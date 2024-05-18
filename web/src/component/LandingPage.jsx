@@ -8,9 +8,9 @@ const LandingPage = () => {
     <div className="grid place-items-center bg-[#000000] text-[#F5F5F5] min-h-screen p-8 sm:pl-16 sm:pr-16">
       <header className="grid w-full h-16 grid-cols-9 items-center">
         <h1 className="col-span-3 justify-self-start font-bold text-md sm:text-3xl font-serif">
-          bag
+          🎒bag
           <Link
-            className="ml-6 hover:bg-black hover:text-[#F5F5F5] bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
+            className="ml-6 bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
             to={"https://tally.so/r/nr6Dkp"}
           >
             Join Waitlist
