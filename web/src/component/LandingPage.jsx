@@ -6,22 +6,20 @@ const LandingPage = () => {
   const targetDate = new Date(2024, 5, 9).getTime();
   return (
     <div className="grid place-items-center bg-[#000000] text-[#F5F5F5] min-h-screen p-8 sm:pl-16 sm:pr-16">
-      <header className="grid w-full h-16 grid-cols-9 items-center">
-        <h1 className="col-span-3 justify-self-start font-bold text-md sm:text-3xl font-serif">
-          🎒bag
+      <header className="flex flex-col sm:flex-row justify-between w-full h-auto sm:h-16 items-center">
+        <div className="flex items-center justify-between w-full sm:w-auto mb-4 sm:mb-0">
+          <img className="w-24 h-14" src="../../logo.svg" alt="Logo" />
           <Link
-            className="ml-6 bg-[#F5F5F5] text-black px-6 py-2 rounded-md text-sm inline-block"
+            className="ml-6 bg-[#F5F5F5] text-black px-4 py-2 rounded-md text-sm inline-block h-10 font-bold my-auto sm:ml-4"
             to={"https://tally.so/r/nr6Dkp"}
           >
             Join Waitlist
           </Link>
-        </h1>
-
-        <div className="col-span-3"></div>
-        <div className="col-span-3 flex justify-end items-center font-serif">
+        </div>
+        <div className="flex justify-end items-center w-full sm:w-auto font-serif">
           <Link to="/faq">
-            <p className="cursor-pointer font-bold mr-6 hover:text-gray-400 ">
-              Faq
+            <p className="cursor-pointer font-bold mr-4 hover:text-gray-400">
+              FAQ
             </p>
           </Link>
           <a
@@ -41,6 +39,7 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+      <p className="text-gray-400 text-sm mt-2 font-bold">Example Bag</p>
       <div className="flex flex-wrap justify-center gap-5">
         <div className="flex flex-col text-center">
           <img
@@ -48,7 +47,6 @@ const LandingPage = () => {
             src={bag}
             alt=""
           />
-          <p className="text-gray-400 text-sm mt-2">Example 1</p>
         </div>
         <div className="flex flex-col text-center">
           <img
@@ -56,7 +54,6 @@ const LandingPage = () => {
             src={bag}
             alt=""
           />
-          <p className="text-gray-400 text-sm mt-2">Example 2</p>
         </div>
         <div className="flex flex-col text-center">
           <img
@@ -64,7 +61,6 @@ const LandingPage = () => {
             src={bag}
             alt=""
           />
-          <p className="text-gray-400 text-sm mt-2">Example 3</p>
         </div>
       </div>
       <footer className="mt-8 text-center">
