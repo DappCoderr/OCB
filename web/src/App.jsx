@@ -2,7 +2,7 @@ import { useState } from "react";
 import Header from "./component/Header";
 import Home from "./component/Home";
 import Mint from "./component/Mint";
-import FAQ from "./component/Faq";
+import FAQ from "./component/FAQ";
 
 const App = () => {
   const [walletConnected, setWalletConnected] = useState(false);
