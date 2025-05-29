@@ -101,7 +101,7 @@ function FAQ() {
         </p>
         <div className="flex justify-center space-x-4">
           <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-            Telegram
+            X
           </button>
           <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors">
             Email
