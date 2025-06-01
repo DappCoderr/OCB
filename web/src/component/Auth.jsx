@@ -1,9 +1,11 @@
 import { useCurrentFlowUser, useFlowAccount } from "@onflow/kit";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getFlowTokenBalance } from "../flow/Script/getFlowTokenBalance.script";
 
 const Auth = () => {
   const { user, authenticate, unauthenticate } = useCurrentFlowUser();
   const [isOpen, setIsOpen] = useState(false);
+  const [userFlowBalance, setUserFlowBalance] = useState(null);
   const {
     data: account,
     isLoading,
@@ -13,6 +15,20 @@ const Auth = () => {
     address: user?.addr,
     query: { staleTime: 5000 },
   });
+
+  useEffect(() => {
+    async function fetchBalance() {
+      if (user?.addr) {
+        try {
+          const bal = await getFlowTokenBalance(user.addr);
+          setUserFlowBalance(Number(bal));
+        } catch (e) {
+          setUserFlowBalance(null);
+        }
+      }
+    }
+    fetchBalance();
+  }, [user?.addr]);
 
   const copyToClipboard = async () => {
     try {
@@ -110,6 +126,14 @@ const Auth = () => {
                   <span className="text-sm text-gray-600">Balance:</span>
                   <span className="text-sm font-medium">
                     {account.balance} FLOW
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Flow Balance:</span>
+                  <span className="text-sm font-medium">
+                    {userFlowBalance !== null
+                      ? userFlowBalance + " FLOW"
+                      : "..."}
                   </span>
                 </div>
                 <button
