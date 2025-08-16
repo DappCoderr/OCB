@@ -2,16 +2,29 @@
 function Home({ setCurrentPage }) {
   return (
     <main className="max-w-2xl mx-auto px-6 py-12">
-      <div className="text-center mb-8">
-        <p className="text-gray-600 text-[16px] mb-6">
-          OCB is a randomized adventurer gear, generated & stored fully on-chain
-          built for believers. First collection where mint stakes are pooled,
-          and holders have a weekly chance to <b>win yield</b>.
-          <br />
-          <b>Identity</b>, <b>Collection</b>, and <b>Rewards</b> — all packed
-          into one Bag.
-        </p>
-      </div>
+      <div className="text-center space-y-6">
+
+  <p className="text-[14px] text-gray-700 leading-relaxed">
+    <span className="font-medium">OCB</span> is the first NFT collection where your mint isn’t just art —
+    it’s an <span className="font-semibold">investment in the network</span>.
+    Every mint is staked into Flow nodes, generating yield.
+    Each week, one Bag holder wins the staking rewards through
+    <span className="font-medium text-green-600"> Flow-VRF</span>.
+  </p>
+
+  <p className="text-[14px] text-gray-700 leading-relaxed">
+    This is art with utility. Provenance with purpose.
+    A collection that <span className="font-semibold text-green-600">gives back</span> — and lets you
+    <span className="font-bold text-green-700"> win yield</span>.
+  </p>
+
+  <p className="text-[14px] font-semibold text-gray-900">
+    <span className="text-green-600 ">Identity</span>,{" "}
+    <span className="text-green-600">Collection</span>, and{" "}
+    <span className="text-green-600">Rewards</span> — all packed into one Bag.
+  </p>
+</div>
+
 
       {/* Features */}
       {/* <div className="space-y-6 mb-12">
