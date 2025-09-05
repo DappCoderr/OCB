@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@onflow/fcl": "^1.18.0",
+    "@onflow/kit": "^0.2.1",
+    "@onflow/types": "^1.4.1",
     "react": "^18.2.0",
     "react-countdown": "^2.3.5",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.0"
+    "react-hot-toast": "^2.5.2",
+    "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

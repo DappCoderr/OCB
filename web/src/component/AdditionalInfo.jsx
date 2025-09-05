@@ -6,7 +6,7 @@ const AdditionalInfo = () => {
         <li>• Maximum 10 NFTs per transaction</li>
         <li>• View your NFT instantly on FlowView after minting</li>
         <li>• Rewards will be started once all NFTs are sold out</li>
-        <li>• 50 NFTs are reserved for the team</li>
+        <li>• 100 NFTs are reserved for the team</li>
         <li>• Zero-gas fees</li>
       </ul>
     </div>
