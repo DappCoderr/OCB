@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 export const GET_DELEGATE_INFO = `
 import FlowStakingCollection from 
@@ -17,7 +17,7 @@ export async function getDelegateInfo(address) {
     });
     return response;
   } catch (error) {
-    console.error("Error in getting delegate Info:", error);
+    console.error('Error in getting delegate Info:', error);
     throw error;
   }
 }

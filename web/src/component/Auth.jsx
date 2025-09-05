@@ -1,6 +1,6 @@
-import { useCurrentFlowUser, useFlowAccount } from "@onflow/kit";
-import { useState, useEffect } from "react";
-import { getFlowTokenBalance } from "../flow/Script/getFlowTokenBalance.script";
+import { useCurrentFlowUser, useFlowAccount } from '@onflow/kit';
+import { useState, useEffect } from 'react';
+import { getFlowTokenBalance } from '../flow/Script/getFlowTokenBalance.script';
 
 const Auth = () => {
   const { user, authenticate, unauthenticate } = useCurrentFlowUser();
@@ -35,7 +35,7 @@ const Auth = () => {
       await navigator.clipboard.writeText(user?.addr);
       // You could add a toast notification here
     } catch (err) {
-      console.error("Failed to copy address:", err);
+      console.error('Failed to copy address:', err);
     }
   };
 
@@ -44,7 +44,7 @@ const Auth = () => {
       await unauthenticate();
       setIsOpen(false);
     } catch (error) {
-      console.error("Failed to disconnect:", error);
+      console.error('Failed to disconnect:', error);
     }
   };
 
@@ -70,7 +70,7 @@ const Auth = () => {
         </span>
         <svg
           className={`w-4 h-4 transition-transform ${
-            isOpen ? "rotate-180" : ""
+            isOpen ? 'rotate-180' : ''
           }`}
           fill="none"
           stroke="currentColor"
@@ -132,8 +132,8 @@ const Auth = () => {
                   <span className="text-sm text-gray-600">Flow Balance:</span>
                   <span className="text-sm font-medium">
                     {userFlowBalance !== null
-                      ? userFlowBalance + " FLOW"
-                      : "..."}
+                      ? userFlowBalance + ' FLOW'
+                      : '...'}
                   </span>
                 </div>
                 <button

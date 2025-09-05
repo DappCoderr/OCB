@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 const GET_BAG_PRICE = `
 import Bag from 0xdb2133aaf990813c
@@ -13,7 +13,7 @@ export async function getBagPrice() {
     });
     return response;
   } catch (error) {
-    console.error("Error get bag price:", error);
+    console.error('Error get bag price:', error);
     throw error;
   }
 }

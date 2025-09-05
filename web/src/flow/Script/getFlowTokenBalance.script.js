@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 const GET_FLOW_TOKEN_BALANCE = `
 import FungibleToken from 0x9a0766d93b6608b7
@@ -24,7 +24,7 @@ export async function getFlowTokenBalance(address) {
     });
     return response;
   } catch (error) {
-    console.error("Error in getting flow token balance:", error);
+    console.error('Error in getting flow token balance:', error);
     throw error;
   }
 }

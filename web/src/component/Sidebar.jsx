@@ -1,5 +1,5 @@
-import ContractInfo from "./ContractInfo";
-import StakingInfo from "./StakingInfo";
+import ContractInfo from './ContractInfo';
+import StakingInfo from './StakingInfo';
 
 const Sidebar = ({ contractBalance }) => {
   return (

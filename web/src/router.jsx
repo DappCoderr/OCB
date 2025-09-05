@@ -1,13 +1,13 @@
-import { createBrowserRouter } from "react-router-dom";
-import App from "./App";
-import Home from "./component/Home";
-import Mint from "./component/Mint";
-import FAQ from "./component/FAQ";
-import ErrorBoundary from "./component/ErrorBoundary";
+import { createBrowserRouter } from 'react-router-dom';
+import App from './App';
+import Home from './component/Home';
+import Mint from './component/Mint';
+import FAQ from './component/FAQ';
+import ErrorBoundary from './component/ErrorBoundary';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     errorElement: <ErrorBoundary />,
     children: [
@@ -16,11 +16,11 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/mint",
+        path: '/mint',
         element: <Mint />,
       },
       {
-        path: "/faq",
+        path: '/faq',
         element: <FAQ />,
       },
     ],

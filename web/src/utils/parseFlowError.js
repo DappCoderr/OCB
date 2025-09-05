@@ -1,9 +1,9 @@
 export function parseFlowError(error) {
   let msg =
-    (typeof error === "string" && error) ||
+    (typeof error === 'string' && error) ||
     (error && error.message) ||
     (error && error.errorMessage) ||
-    "Transaction failed";
+    'Transaction failed';
 
   // Try to extract a user-friendly message from Cadence errors
   // Look for "pre-condition failed: ..." or "error: ..."
@@ -17,7 +17,7 @@ export function parseFlowError(error) {
   }
   // Fallback: show only the first line if it's too long
   if (msg.length > 120) {
-    return msg.split("\n")[0];
+    return msg.split('\n')[0];
   }
   return msg;
 }

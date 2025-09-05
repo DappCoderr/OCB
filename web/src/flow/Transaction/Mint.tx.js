@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 const MINT = `import Bag from 0xdb2133aaf990813c
 import FungibleToken from 0x9a0766d93b6608b7
@@ -45,12 +45,12 @@ export async function mintNFT(amount) {
   } catch (error) {
     // Robust error handling
     const msg =
-      (typeof error === "string" && error) ||
+      (typeof error === 'string' && error) ||
       (error && error.message) ||
       (error && error.errorMessage) ||
-      "Transaction failed";
-    if (msg.toLowerCase().includes("declined")) {
-      throw new Error("User denied transaction");
+      'Transaction failed';
+    if (msg.toLowerCase().includes('declined')) {
+      throw new Error('User denied transaction');
     }
     throw new Error(msg);
   }

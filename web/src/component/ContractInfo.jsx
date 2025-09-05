@@ -8,7 +8,7 @@ const ContractInfo = ({ contractBalance }) => {
         <div className="text-2xl font-bold text-gray-800 mb-1">
           {contractBalance !== null
             ? Math.floor(contractBalance).toLocaleString()
-            : "-"}
+            : '-'}
         </div>
         <div className="text-gray-500 text-xs">FLOW</div>
       </div>

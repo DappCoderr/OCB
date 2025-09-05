@@ -18,7 +18,7 @@ transaction(nodeID: String, delegatorID: UInt32?, amount: UFix64) {
         self.stakingCollectionRef.withdrawRewardedTokens(nodeID: nodeID, delegatorID: delegatorID, amount: amount)
     }
 }
-`
+`;
 
 export async function withdrawReward(nodeId, delegateId, amount) {
   try {
@@ -36,12 +36,12 @@ export async function withdrawReward(nodeId, delegateId, amount) {
     return res;
   } catch (error) {
     const msg =
-      (typeof error === "string" && error) ||
+      (typeof error === 'string' && error) ||
       (error && error.message) ||
       (error && error.errorMessage) ||
-      "Transaction failed";
-    if (msg.toLowerCase().includes("declined")) {
-      throw new Error("User denied transaction");
+      'Transaction failed';
+    if (msg.toLowerCase().includes('declined')) {
+      throw new Error('User denied transaction');
     }
     throw new Error(msg);
   }

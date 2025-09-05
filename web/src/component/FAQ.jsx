@@ -1,48 +1,48 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 function FAQ() {
   const [openFAQ, setOpenFAQ] = useState(null);
 
   const faqs = [
     {
-      question: "What is OCB 0.1?",
+      question: 'What is OCB 0.1?',
       answer:
         "OCB stands for On-Chain Bag, and 0.1 represents it's version. It's for who believe in Flow, NFTs, Rewards, and Community Owned Artworks — Just pure, on-chain identity built by and for the people.",
     },
     {
-      question: "How much does it cost to mint?",
+      question: 'How much does it cost to mint?',
       answer:
-        "Each NFT costs 120.0 FLOW to mint. You can mint up to 10 NFTs per transaction.",
+        'Each NFT costs 120.0 FLOW to mint. You can mint up to 10 NFTs per transaction.',
     },
     {
-      question: "What makes this project different?",
+      question: 'What makes this project different?',
       answer:
-        "We prioritize true decentralization and community ownership. There are no platform restrictions, marketplace lock-ins. The art and ownership belong entirely to the community.",
+        'We prioritize true decentralization and community ownership. There are no platform restrictions, marketplace lock-ins. The art and ownership belong entirely to the community.',
     },
     {
-      question: "Are there royalties?",
+      question: 'Are there royalties?',
       answer:
-        "Yes. A portion of secondary sales goes to the platform — and that share is also staked into the network to generate additional yield for the community.",
+        'Yes. A portion of secondary sales goes to the platform — and that share is also staked into the network to generate additional yield for the community.',
     },
     {
-      question: "Can I transfer my NFTs?",
+      question: 'Can I transfer my NFTs?',
       answer:
-        "Absolutely. Your NFTs are fully transferable with no restrictions. You can sell, trade, or gift them on any marketplace.",
+        'Absolutely. Your NFTs are fully transferable with no restrictions. You can sell, trade, or gift them on any marketplace.',
     },
     {
-      question: "What blockchain is this on?",
+      question: 'What blockchain is this on?',
       answer:
-        "OCB 0.1 is built on Flow mainnet, ensuring maximum compatibility and decentralization.",
+        'OCB 0.1 is built on Flow mainnet, ensuring maximum compatibility and decentralization.',
     },
     {
-      question: "What happens after mint?",
+      question: 'What happens after mint?',
       answer:
         "Your NFT metadata is revealed immediately after minting. You'll own a unique piece of digital art that's permanently stored on the blockchain.",
     },
     {
-      question: "Is there a roadmap?",
+      question: 'Is there a roadmap?',
       answer:
-        "We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable, community-driven collection that stands the test of time through genuine artistic value.",
+        'We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable, community-driven collection that stands the test of time through genuine artistic value.',
     },
   ];
 
@@ -51,7 +51,7 @@ function FAQ() {
   };
 
   const handleExternalLink = (url) => {
-    window.open(url, "_blank");
+    window.open(url, '_blank');
   };
 
   return (
@@ -78,7 +78,7 @@ function FAQ() {
               <span>{faq.question}</span>
               <span
                 className={`transform transition-transform ${
-                  openFAQ === index ? "rotate-180" : ""
+                  openFAQ === index ? 'rotate-180' : ''
                 }`}
               >
                 ▼
@@ -109,7 +109,7 @@ function FAQ() {
           <button
             onClick={() =>
               handleExternalLink(
-                "https://contractbrowser.com/A.36e0dc989fe11d54.Bag"
+                'https://contractbrowser.com/A.36e0dc989fe11d54.Bag'
               )
             }
             className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors"

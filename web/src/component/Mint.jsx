@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
-import { useCurrentFlowUser } from "@onflow/kit";
-import { getMaxSupply } from "../flow/Script/getMaxSupply.script";
-import { getBagPrice } from "../flow/Script/getBagPrice.script";
-import { getTotalSupply } from "../flow/Script/getTotalSupply.script";
-import { mintNFT } from "../flow/Transaction/Mint.tx";
-import { getFlowTokenBalance } from "../flow/Script/getFlowTokenBalance.script";
-import { getCheckCollection } from "../flow/Script/getCheckCollection.script";
-import toast from "react-hot-toast";
-import { parseFlowError } from "../utils/parseFlowError";
-import { CONTRACT_ADDRESS } from "../utils/constants";
-import Sidebar from "./Sidebar";
-import AdditionalInfo from "./AdditionalInfo";
-import MintInterface from "./MintInterface";
+import { useState, useEffect } from 'react';
+import { useCurrentFlowUser } from '@onflow/kit';
+import { getMaxSupply } from '../flow/Script/getMaxSupply.script';
+import { getBagPrice } from '../flow/Script/getBagPrice.script';
+import { getTotalSupply } from '../flow/Script/getTotalSupply.script';
+import { mintNFT } from '../flow/Transaction/Mint.tx';
+import { getFlowTokenBalance } from '../flow/Script/getFlowTokenBalance.script';
+import { getCheckCollection } from '../flow/Script/getCheckCollection.script';
+import toast from 'react-hot-toast';
+import { parseFlowError } from '../utils/parseFlowError';
+import { CONTRACT_ADDRESS } from '../utils/constants';
+import Sidebar from './Sidebar';
+import AdditionalInfo from './AdditionalInfo';
+import MintInterface from './MintInterface';
 
 function Mint() {
   const { user } = useCurrentFlowUser();
@@ -43,7 +43,7 @@ function Mint() {
         setTotalSupply(Number(supply));
         setContractBalance(Number(contractBal));
       } catch (e) {
-        setError("Failed to fetch contract data");
+        setError('Failed to fetch contract data');
       } finally {
         setLoading(false);
       }
@@ -57,7 +57,7 @@ function Mint() {
       if (user?.addr) {
         try {
           const has = await getCheckCollection(user.addr);
-          console.log("value", has);
+          console.log('value', has);
           setHasCollection(!!has);
         } catch {
           setHasCollection(false);
@@ -201,12 +201,12 @@ function Mint() {
                 </div>
                 <h3 className="font-bold text-green-800 text-base">
                   Successfully minted {lastMintedCount} NFT
-                  {lastMintedCount > 1 ? "s" : ""}!
+                  {lastMintedCount > 1 ? 's' : ''}!
                 </h3>
               </div>
               <p className="text-green-700 mb-4 text-sm">
-                Your NFT{lastMintedCount > 1 ? "s have" : " has"} been minted
-                successfully. You can view {lastMintedCount > 1 ? "them" : "it"}{" "}
+                Your NFT{lastMintedCount > 1 ? 's have' : ' has'} been minted
+                successfully. You can view {lastMintedCount > 1 ? 'them' : 'it'}{' '}
                 on FlowView once the metadata is processed.
               </p>
               <a

@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import { useCurrentFlowUser } from "@onflow/kit";
-import Auth from "./Auth";
-import Unauth from "./Unauth";
+import { Link } from 'react-router-dom';
+import { useCurrentFlowUser } from '@onflow/kit';
+import Auth from './Auth';
+import Unauth from './Unauth';
 
 const Header = () => {
   const { user } = useCurrentFlowUser();

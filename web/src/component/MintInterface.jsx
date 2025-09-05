@@ -1,4 +1,4 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 const MintInterface = ({
   setMintCount,
@@ -49,15 +49,15 @@ const MintInterface = ({
         disabled={!isWalletConnected || minting}
         className={`w-full py-3 rounded font-bold transition-colors text-base ${
           isWalletConnected && !minting
-            ? "bg-black text-white hover:bg-gray-800"
-            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            ? 'bg-black text-white hover:bg-gray-800'
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
         }`}
       >
         {minting
-          ? "Minting..."
+          ? 'Minting...'
           : isWalletConnected
-          ? `Mint ${mintCount} NFT${mintCount > 1 ? "s" : ""}`
-          : "Connect Wallet to Mint"}
+            ? `Mint ${mintCount} NFT${mintCount > 1 ? 's' : ''}`
+            : 'Connect Wallet to Mint'}
       </button>
     </div>
   );

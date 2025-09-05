@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 export const GET_COLLECTION_CHECK = `
 import Bag from 0xdb2133aaf990813c
@@ -18,7 +18,7 @@ export async function getCheckCollection(address) {
     });
     return response;
   } catch (error) {
-    console.error("Error in getting collection check:", error);
+    console.error('Error in getting collection check:', error);
     throw error;
   }
 }

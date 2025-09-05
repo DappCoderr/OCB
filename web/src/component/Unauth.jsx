@@ -1,4 +1,4 @@
-import { useCurrentFlowUser } from "@onflow/kit";
+import { useCurrentFlowUser } from '@onflow/kit';
 
 const Unauth = () => {
   const { signIn } = useCurrentFlowUser();

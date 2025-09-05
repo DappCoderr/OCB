@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 const GET_TOTAL_SUPPLY = `
 import Bag from 0xdb2133aaf990813c
@@ -13,7 +13,7 @@ export async function getTotalSupply() {
     });
     return response;
   } catch (error) {
-    console.error("Error get bag total supply:", error);
+    console.error('Error get bag total supply:', error);
     throw error;
   }
 }

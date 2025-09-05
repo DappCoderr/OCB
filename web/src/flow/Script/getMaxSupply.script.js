@@ -1,4 +1,4 @@
-import * as fcl from "@onflow/fcl";
+import * as fcl from '@onflow/fcl';
 
 const GET_MAX_SUPPLY = `
 import Bag from 0xdb2133aaf990813c
@@ -14,7 +14,7 @@ export async function getMaxSupply() {
     });
     return response;
   } catch (error) {
-    console.error("Error get bag max supply:", error);
+    console.error('Error get bag max supply:', error);
     throw error;
   }
 }

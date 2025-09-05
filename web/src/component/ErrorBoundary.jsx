@@ -1,4 +1,4 @@
-import { useRouteError, Link } from "react-router-dom";
+import { useRouteError, Link } from 'react-router-dom';
 
 const ErrorBoundary = () => {
   const error = useRouteError();
@@ -9,7 +9,7 @@ const ErrorBoundary = () => {
         <h1 className="text-4xl font-bold text-red-600 mb-4">Oops!</h1>
         <p className="text-xl text-gray-700 mb-4">Something went wrong</p>
         <p className="text-gray-500 mb-8">
-          {error.message || "An unexpected error occurred"}
+          {error.message || 'An unexpected error occurred'}
         </p>
         <Link
           to="/"

@@ -1,4 +1,4 @@
-import { NODE_ID, NODE_TYPE } from "../utils/constants";
+import { NODE_ID, NODE_TYPE } from '../utils/constants';
 
 const StakingInfo = () => {
   return (
