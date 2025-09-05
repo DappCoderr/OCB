@@ -10,7 +10,7 @@ function Home() {
     Each week, one Bag holder wins the staking rewards through
     <span className="font-medium text-green-600"> Flow-VRF</span>.
   </p>
-
+ 
   <p className="text-[14px] text-gray-700 leading-relaxed">
     This is art with utility. Provenance with purpose.
     A collection that <span className="font-semibold text-green-600">gives back</span> — and lets you
