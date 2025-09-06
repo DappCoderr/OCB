@@ -1,39 +1,31 @@
-import { useCurrentFlowUser, useFlowAccount } from '@onflow/kit';
-import { useState, useEffect } from 'react';
-import { getFlowTokenBalance } from '../flow/Script/getFlowTokenBalance.script';
+import { useState } from 'react';
+import { useFlowCurrentUser, useFlowAccount } from '@onflow/react-sdk';
 
 const Auth = () => {
-  const { user, authenticate, unauthenticate } = useCurrentFlowUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [userFlowBalance, setUserFlowBalance] = useState(null);
+  const { user, authenticate, unauthenticate } = useFlowCurrentUser();
+
   const {
     data: account,
     isLoading,
     error,
-    refetch,
   } = useFlowAccount({
     address: user?.addr,
-    query: { staleTime: 5000 },
+    query: {
+      staleTime: 5000,
+      enabled: !!user?.addr,
+    },
   });
 
-  useEffect(() => {
-    async function fetchBalance() {
-      if (user?.addr) {
-        try {
-          const bal = await getFlowTokenBalance(user.addr);
-          setUserFlowBalance(Number(bal));
-        } catch (e) {
-          setUserFlowBalance(null);
-        }
-      }
-    }
-    fetchBalance();
-  }, [user?.addr]);
+  const formatBalance = (balance) => {
+    if (!balance) return '0.00000000';
+    const balanceNumber = Number(balance);
+    return (balanceNumber / 100000000).toFixed(2);
+  };
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(user?.addr);
-      // You could add a toast notification here
+      await navigator.clipboard.writeText(user?.addr || '');
     } catch (err) {
       console.error('Failed to copy address:', err);
     }
@@ -116,35 +108,23 @@ const Auth = () => {
           {/* Account Details */}
           <div className="px-4 py-2 border-b border-gray-200">
             <div className="text-xs text-gray-500 mb-1">Account Details</div>
-            {isLoading ? (
+            {!user?.addr ? (
+              <div className="text-sm text-gray-600">No address available</div>
+            ) : isLoading ? (
               <div className="text-sm text-gray-600">Loading account...</div>
             ) : error ? (
               <div className="text-sm text-red-600">Error: {error.message}</div>
             ) : account ? (
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Balance:</span>
-                  <span className="text-sm font-medium">
-                    {account.balance} FLOW
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Flow Balance:</span>
                   <span className="text-sm font-medium">
-                    {userFlowBalance !== null
-                      ? userFlowBalance + ' FLOW'
-                      : '...'}
+                    {formatBalance(account.balance)} FLOW
                   </span>
                 </div>
-                <button
-                  onClick={refetch}
-                  className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  Refresh Data
-                </button>
               </div>
             ) : (
-              <div className="text-sm text-gray-600">No account data</div>
+              <div className="text-sm text-gray-600">No account data found</div>
             )}
           </div>
 
