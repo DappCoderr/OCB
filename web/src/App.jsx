@@ -1,13 +1,13 @@
-import { Outlet } from 'react-router-dom';
-import Header from './component/Header';
+import { BrowserRouter } from 'react-router-dom';
+import AppProvider from './providers/AppProvider';
+import Layout from './router/layout';
 
-const App = () => {
-  return (
-    <div className="min-h-screen bg-gray-50 font-mono text-sm leading-relaxed">
-      <Header />
-      <Outlet />
-    </div>
-  );
-};
+const App = () => (
+  <AppProvider>
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
+  </AppProvider>
+);
 
 export default App;
