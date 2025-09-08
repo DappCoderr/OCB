@@ -1,6 +1,6 @@
-import Bag from 0xcff932efdb9a69c3
-import FungibleToken from 0x9a0766d93b6608b7
-import FlowToken from 0x7e60df042a9c0868
+import Bag from "../contracts/Bag.cdc"
+import FungibleToken from "../contracts/interface/FungibleToken.cdc"
+import FlowToken from "../contracts/interface/FlowToken.cdc"
 
 transaction(amount:UFix64){
     let Payment: @FlowToken.Vault
