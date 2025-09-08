@@ -1,4 +1,4 @@
-import Bag from 0xdb2133aaf990813c
+import Bag from "../contracts/Bag.cdc"
 
 access(all) fun main(addr:Address): Bool{
     let account = getAccount(addr)
