@@ -21,7 +21,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
     access(all) event ContractInitialized()
     access(all) event NFTWithdrawn(id: UInt64, from: Address?)
     access(all) event NFTDeposited(id: UInt64, to: Address?)
-    access(all) event NFTMinted(id: UInt64, svg: String)
+    access(all) event NFTMinted(id: UInt64, svg: String, mintedFor: Address)
 
     /* --- Storage Paths --- */
     access(all) let CollectionStoragePath: StoragePath
@@ -239,7 +239,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
                 ?? panic("Rarity score not found for NFT ID: ".concat(id.toString()))
             
             var newNFT <- create NFT(id: id, svg: svg, rarityScore: rarityScore)
-            emit NFTMinted(id: newNFT.id, svg: newNFT.svg)
+            emit NFTMinted(id: newNFT.id, svg: newNFT.svg, mintedFor: recipient)
             
             return <- newNFT
         }
@@ -409,12 +409,13 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         return "data:image/svg+xml;base64,".concat(base64SVG)
     }
 
-    access(all) fun mintNFT(payment: @FlowToken.Vault): @Bag.NFT {
+    access(all) fun mintNFT(user:Address, payment: @FlowToken.Vault): @Bag.NFT {
         pre {
             self.totalSupply < (self.maxSupply - self.reservedSupply): 
                 "Maximum supply reached. Total supply: ".concat(self.totalSupply.toString())
             payment.balance >= self.mintPrice: 
                 "Insufficient payment. Required: ".concat(self.mintPrice.toString()).concat(", Provided: ").concat(payment.balance.toString())
+            self.getCollectionLength(user: user) < 20 : "Maximum 20 Bag per account"
         }
         
         let contractReceiver = self.account.capabilities
@@ -426,11 +427,11 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         Bag.totalSupply = Bag.totalSupply + 1
         let id = Bag.totalSupply
         let svg = Bag.createSVG()
-        let rarityScore = self.bagRarityScores[id] 
-            ?? panic("Rarity score not found for NFT ID: ".concat(id.toString()))
+
+        let rarityScore = self.bagRarityScores[id] ?? panic("Rarity score not found for NFT ID: ".concat(id.toString()))
         
         var newNFT <- create NFT(id: id, svg: svg, rarityScore: rarityScore)
-        emit NFTMinted(id: newNFT.id, svg: newNFT.svg)
+        emit NFTMinted(id: newNFT.id, svg: newNFT.svg, mintedFor:user)
         
         return <- newNFT
     }
@@ -545,12 +546,12 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         return getAccount(user).capabilities.get<&Bag.Collection>(Bag.CollectionPublicPath).borrow()?? panic("Cannot borrow collection reference")
     }
 
-    access(all) view fun getCollectionSize(user: Address): [UInt64] {
+    access(all) view fun getCollectionLength(user: Address): Int {
         pre {
             self.hasCollection(user: user): "User does not have a Bag collection"
         }
 
-        return self.getCollectionRef(user:user).getIDs()
+        return self.getCollectionRef(user:user).getIDs().length
     }
 
     access(all) view fun getCollectionNFTIds(user: Address): [UInt64] {
@@ -572,16 +573,16 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         return nft.rarityScore
     }
 
-    init(owner: Address) {
+    init(owner: Address, mintPrice:UFix64, reserveSupply:UInt64) {
         self.totalSupply = 0
         self.maxSupply = 7777
-        self.mintPrice = 150.0
+        self.mintPrice = mintPrice
         self.traitsDetails = {}
         self.bagRarityScores = {}
         self.uniqueTraitsCombinations = []
 
         self.owner = owner
-        self.reservedSupply = 100
+        self.reservedSupply = reserveSupply
         self.reservedMinted = 0
 
         self.CollectionStoragePath = /storage/BagCollection

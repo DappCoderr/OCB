@@ -148,7 +148,7 @@ access(all) contract BagLottery {
         
         assert(lottery.isResolved, message: "Lottery has not been resolved yet")
 
-        let userNFTIds = Bag.getCollectionSize(user: claimerAddress)
+        let userNFTIds = Bag.getCollectionNFTIds(user: claimerAddress)
         let winner_NFTId = lottery.winner_NFTId
         
         // Check if claimant owns the winning NFT
