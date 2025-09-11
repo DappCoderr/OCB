@@ -1,23 +1,22 @@
-import TestBag from "../../contracts/TestBag.cdc"
 import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
 import FlowToken from "../../contracts/interface/FlowToken.cdc"
+import Bag from "../../contracts/Bag.cdc"
 
 transaction(user:Address){
 
-    let adminRef: &TestBag.Admin
-    let collectionRef: &TestBag.Collection
+    let adminRef: &Bag.Admin
+    let collectionRef: &Bag.Collection
 
     prepare(signer: auth(Storage, Capabilities) &Account) {
 
-        if signer.storage.borrow<&TestBag.Collection>(from: TestBag.CollectionStoragePath) == nil {
-            signer.storage.save(<- TestBag.createEmptyCollection(nftType: Type<@TestBag.NFT>()), to: TestBag.CollectionStoragePath)
-            let collectionCap = signer.capabilities.storage.issue<&TestBag.Collection>(TestBag.CollectionStoragePath)
-            signer.capabilities.publish(collectionCap, at: TestBag.CollectionPublicPath) 
+        if signer.storage.borrow<&Bag.Collection>(from: Bag.CollectionStoragePath) == nil {
+            signer.storage.save(<- Bag.createEmptyCollection(nftType: Type<@Bag.NFT>()), to: Bag.CollectionStoragePath)
+            let collectionCap = signer.capabilities.storage.issue<&Bag.Collection>(Bag.CollectionStoragePath)
+            signer.capabilities.publish(collectionCap, at: Bag.CollectionPublicPath) 
         }
 
-        self.collectionRef = signer.storage.borrow<&TestBag.Collection>(from: TestBag.CollectionStoragePath) ?? panic("Could not found the collection")
-
-        self.adminRef = signer.storage.borrow<&TestBag.Admin>(from: TestBag.AdminStoragePath) ?? panic("Could not found the Admin in storage")
+        self.collectionRef = signer.storage.borrow<&Bag.Collection>(from: Bag.CollectionStoragePath) ?? panic("Could not found the collection")
+        self.adminRef = signer.storage.borrow<&Bag.Admin>(from: Bag.AdminStoragePath) ?? panic("Could not found the Admin in storage")
 
     }
 

@@ -1,68 +1,102 @@
-import NonFungibleToken from 0x631e88ae7f1d7c20
-import FungibleToken from 0x9a0766d93b6608b7
-import FlowToken from 0x7e60df042a9c0868
-import MetadataViews from 0x631e88ae7f1d7c20
-import ViewResolver from 0x631e88ae7f1d7c20
-import Background from 0x4e4b4b2dd2fc8019
-import Body from 0x4e4b4b2dd2fc8019
-import Cloth from 0x4e4b4b2dd2fc8019
-import Weapon from 0x4e4b4b2dd2fc8019
-import Glove from 0x4e4b4b2dd2fc8019
-import Ring from 0x4e4b4b2dd2fc8019
-import Helmet from 0x4e4b4b2dd2fc8019
-// import Rarity from 0x4e4b4b2dd2fc8019
-import Base64 from 0x4e4b4b2dd2fc8019
+import NonFungibleToken from "./interface/NonFungibleToken.cdc"
+import FungibleToken from "./interface/FungibleToken.cdc"
+import FlowToken from "./interface/FlowToken.cdc"
+import MetadataViews from "./interface/MetadataViews.cdc"
+import ViewResolver from "./interface/ViewResolver.cdc"
 
-access(all) contract Bag: NonFungibleToken {
+import Base64Util from "./Base64Util.cdc"
 
+import Background from "./components/Background.cdc"
+import Body from "./components/Body.cdc"
+import Cloth from "./components/Cloth.cdc"
+import Weapon from "./components/Weapon.cdc"
+import Glove from "./components/Glove.cdc"
+import Ring from "./components/Ring.cdc"
+import Helmet from "./components/Helmet.cdc"
+import Rarity from "./components/Rarity.cdc"
+
+access(all) contract Bag: NonFungibleToken, ViewResolver {
+
+    /* --- Events --- */
     access(all) event ContractInitialized()
-    access(all) event Withdraw(id: UInt64, from: Address?)
-    access(all) event Deposit(id: UInt64, to: Address?)
-    access(all) event Minted(id: UInt64, svg:String)
+    access(all) event NFTWithdrawn(id: UInt64, from: Address?)
+    access(all) event NFTDeposited(id: UInt64, to: Address?)
+    access(all) event NFTMinted(id: UInt64, svg: String)
 
-    // Storage and Public Paths
+    /* --- Storage Paths --- */
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath
+    access(all) let CollectionPrivatePath: PrivatePath
+    access(all) let AdminStoragePath: StoragePath
 
-    // State Variable
+    /* --- Contract State --- */
     access(all) var totalSupply: UInt64
-    access(all) var maxSupply: UInt64
-    access(all) let bagPrice: UFix64
-    access(all) let team: Address
+    access(all) let maxSupply: UInt64
+    access(all) let mintPrice: UFix64
     access(all) let reservedSupply: UInt64
     access(all) var reservedMinted: UInt64
+    access(all) var traitsDetails: {UInt64: Bag.TraitsDetails}
+    access(all) var bagRarityScores: {UInt64: UInt64} 
+    access(all) var uniqueTraitsCombinations: [String]
+    access(self) let owner: Address
 
-    access(all) var bagsRarityScore: {UInt64: UInt64} 
+    access(all) struct TraitsDetails {
+        access(all) var background: String
+        access(all) var body: String
+        access(all) var cloth: String
+        access(all) var glove: String
+        access(all) var helmet: String
+        access(all) var ring: String
+        access(all) var weapon: String
 
-    access(all) fun externalURL(): MetadataViews.ExternalURL {
-        return MetadataViews.ExternalURL("https://xyz.io")
+        init(background: String, body: String, cloth: String, glove: String, helmet: String, ring: String, weapon: String) {
+            self.background = background
+            self.body = body
+            self.cloth = cloth
+            self.glove = glove
+            self.helmet = helmet
+            self.ring = ring
+            self.weapon = weapon
+        }
     }
 
     access(all) resource NFT: NonFungibleToken.NFT {
         access(all) let id: UInt64
         access(all) let svg: String
+        access(all) var winCount: UInt64
+        access(all) var rarityScore: UInt64
 
-        init(id: UInt64, svg: String) 
-        {
+        init(id: UInt64, svg: String, rarityScore: UInt64) {
             self.id = id
             self.svg = svg
+            self.rarityScore = rarityScore
+            self.winCount = 0
         }
 
-        // access(all) fun getRarityScore(id:UInt64): UInt64?{
-        //     return Bag.bagsRarityScore[id]
-        // }
-
-        access(all) fun getSVG(): String{
+        access(all) view fun getSVG(): String {
             return self.svg
         }
 
-        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- Bag.createEmptyCollection(nftType: Type<@NFT>())
+        access(all) view fun getWinCount(): UInt64 {
+            return self.winCount
+        }
+
+        access(all) view fun getRarityScore(): UInt64 {
+            return self.rarityScore
+        }
+
+        access(all) fun updateRarityScore(newScore: UInt64) {
+            self.rarityScore = newScore
+        }
+
+        access(all) fun incrementWinCount() {
+            self.winCount = self.winCount + 1
         }
 
         access(all) view fun getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
+                Type<MetadataViews.ExternalURL>(),
                 Type<MetadataViews.Royalties>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>()
@@ -76,9 +110,11 @@ access(all) contract Bag: NonFungibleToken {
                         name: "Bag # ".concat(self.id.toString()),
                         description: "Bag is a fully on-chain NFT on Flow, crafted with Flow VRF randomness. Each Bag holds 7 unique traits, forming a one-of-a-kind warrior identity. But it’s more than art — all mint proceeds are staked, and the yield goes directly to holders. Bag is identity, utility, and rewards — all packed into a single Bag.",
                         thumbnail: MetadataViews.HTTPFile(url: self.getSVG())
-                    )  
+                    ) 
+                case Type<MetadataViews.ExternalURL>():
+                    return MetadataViews.ExternalURL("https://onchainbag.xyz")
                 case Type<MetadataViews.Royalties>():
-                    let owner = getAccount(Bag.team)
+                    let owner = getAccount(Bag.owner)
                     let cut = MetadataViews.Royalty(
                         receiver: owner.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver),
                         cut: 0.05, // 5% royalty
@@ -90,14 +126,22 @@ access(all) contract Bag: NonFungibleToken {
                     return Bag.resolveContractView(resourceType: Type<@NFT>(), viewType: Type<MetadataViews.NFTCollectionData>())
                 case Type<MetadataViews.NFTCollectionDisplay>():
                     return Bag.resolveContractView(resourceType: Type<@NFT>(), viewType: Type<MetadataViews.NFTCollectionDisplay>())
-            }
-            return nil
+                default:
+                    return nil
+            } 
+        }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- Bag.createEmptyCollection(nftType: Type<@Bag.NFT>())
         }  
     }
 
-    access(all) resource interface BagCollectionPublic {
+    access(all) resource interface CollectionPublic {
+        access(all) view fun getLength(): Int
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}?
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}?
+        access(all) fun forEachID(_ f: fun (UInt64): Bool): Void
         access(all) fun deposit(token: @{NonFungibleToken.NFT})
-        access(all) view fun getIDs(): [UInt64]
         access(all) fun borrowBagNFT(id: UInt64): &Bag.NFT? {
             post {
                 (result == nil) || (result?.id == id):
@@ -105,28 +149,53 @@ access(all) contract Bag: NonFungibleToken {
             }
         }
     }
-    access(all) resource Collection: BagCollectionPublic, NonFungibleToken.Collection {
+    access(all) resource Collection: CollectionPublic, NonFungibleToken.Collection {
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
-        init () {
+        init() {
             self.ownedNFTs <- {}
         }
 
         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             pre {
-                self.ownedNFTs.containsKey(withdrawID): "NFT does not exist in collection."
+                self.ownedNFTs.containsKey(withdrawID): 
+                    "NFT with ID ".concat(withdrawID.toString()).concat(" not found in collection")
             }
+            
             let token <- self.ownedNFTs.remove(key: withdrawID)!
-            emit Withdraw(id: token.id, from: self.owner?.address)
-            return <-token
+            emit NFTWithdrawn(id: token.id, from: self.owner?.address)
+            return <- token
+        }
+
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            return {Type<@Bag.NFT>(): true}
+        }
+
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            return self.getSupportedNFTTypes()[type] ?? false
         }
 
         access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
+            pre {
+                self.isSupportedNFTType(type: token.getType()):
+                    "Unsupported NFT type: ".concat(token.getType().identifier)
+                self.ownedNFTs[token.id] == nil: 
+                    "NFT with ID ".concat(token.id.toString()).concat(" already exists in collection")
+            }
+            
             let token <- token as! @Bag.NFT
-            let id: UInt64 = token.id
-            let oldToken <- self.ownedNFTs[id] <- token
-            emit Deposit(id: id, to: self.owner?.address)
-            destroy oldToken
+            let id = token.id
+            let existingToken <- self.ownedNFTs[id] <- token
+            emit NFTDeposited(id: id, to: self.owner?.address)
+            destroy existingToken
+        }
+
+        access(all) view fun getCollectionSize(): Int {
+            return self.ownedNFTs.length
+        }
+
+        access(all) fun forEachNFTId(_ callback: fun (UInt64): Bool) {
+            self.ownedNFTs.forEachKey(callback)
         }
 
         access(all) view fun getIDs(): [UInt64] {
@@ -136,10 +205,6 @@ access(all) contract Bag: NonFungibleToken {
         access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
             return &self.ownedNFTs[id]
         }
-
-        access(all) view fun getLength(): Int {
-			return self.ownedNFTs.length
-		}
 
         access(all) fun borrowBagNFT(id: UInt64): &Bag.NFT? {
             if self.ownedNFTs[id] != nil {
@@ -151,236 +216,253 @@ access(all) contract Bag: NonFungibleToken {
             }
         }
 
-        access(all)
-		view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}?{ 
-			if let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}? {
-				return nft as &{ViewResolver.Resolver}
-			}
-			return nil
-		}
-
-        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
-            let supportedTypes: {Type: Bool} = {}
-            supportedTypes[Type<@NFT>()] = true
-            return supportedTypes
-        }
-
-        access(all) view fun isSupportedNFTType(type: Type): Bool {
-            return type == Type<@NFT>()
-        }
-
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection}{ 
 			return <- Bag.createEmptyCollection(nftType: Type<@Bag.NFT>())
 		}
+    }
+
+    access(all) resource Admin {
+        access(all) fun mintReservedNFT(recipient: Address): @Bag.NFT {
+            pre {
+                Bag.reservedSupply > Bag.reservedMinted: 
+                    "No reserved NFTs available. Reserved supply: ".concat(Bag.reservedSupply.toString())
+                recipient == Bag.owner: 
+                    "Only contract owner can mint reserved NFTs"
+            }
+            
+            Bag.totalSupply = Bag.totalSupply + 1
+            Bag.reservedMinted = Bag.reservedMinted + 1
+            
+            let id = Bag.totalSupply
+            let svg = Bag.createSVG()
+            let rarityScore = Bag.bagRarityScores[id] 
+                ?? panic("Rarity score not found for NFT ID: ".concat(id.toString()))
+            
+            var newNFT <- create NFT(id: id, svg: svg, rarityScore: rarityScore)
+            emit NFTMinted(id: newNFT.id, svg: newNFT.svg)
+            
+            return <- newNFT
+        }
     }
 
     access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
-    access(all) fun getRandomBackground(): String{
-        let size = Background.backgrounds.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Background.backgrounds[rand]
+    access(all) fun borrowNFT(ownerAddress: Address, nftId: UInt64): &Bag.NFT {
+        let collectionRef = getAccount(ownerAddress)
+            .capabilities
+            .borrow<&Bag.Collection>(Bag.CollectionPublicPath)
+            ?? panic("Cannot borrow collection reference from address: ".concat(ownerAddress.toString()))
+        
+        let nftRef = collectionRef.borrowBagNFT(id: nftId)
+            ?? panic("NFT not found with ID: ".concat(nftId.toString()))
+        
+        return nftRef
     }
 
-    access(all) fun getRandomTypes(): String{
-        let size = Body.body.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Body.body[rand]
+    access(self) fun getRandomBackground(): String {
+        let index = Bag.generateRandomIndex(upperBound: Background.backgrounds.length)
+        return Background.backgrounds[index]
     }
 
-    access(all) fun getRandomCloth(): String{
-        let size = Cloth.cloths.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Cloth.cloths[rand]
+    access(self) fun getRandomBody(): String {
+        let index = Bag.generateRandomIndex(upperBound: Body.body.length)
+        return Body.body[index]
     }
 
-    access(all) fun getRandomWeapons(): String{
-        let size = Weapon.weapons.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Weapon.weapons[rand]
+    access(self) fun getRandomCloth(): String {
+        let index = Bag.generateRandomIndex(upperBound: Cloth.cloths.length)
+        return Cloth.cloths[index]
     }
 
-    access(all) fun getRandomNecklace(): String{
-        let size = Glove.gloves.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Glove.gloves[rand]
+    access(self) fun getRandomWeapon(): String {
+        let index = Bag.generateRandomIndex(upperBound: Weapon.weapons.length)
+        return Weapon.weapons[index]
     }
 
-    access(all) fun getRandomRing(): String{
-        let size = Ring.rings.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Ring.rings[rand]
+    access(self) fun getRandomGlove(): String {
+        let index = Bag.generateRandomIndex(upperBound: Glove.gloves.length)
+        return Glove.gloves[index]
     }
 
-    access(all) fun getRandomHelmet(): String{
-        let size = Helmet.helmets.length
-        let sizes = UInt64(size)
-        let rand = Bag.getRandomNumber(num: sizes)
-        return Helmet.helmets[rand]
+    access(self) fun getRandomRing(): String {
+        let index = Bag.generateRandomIndex(upperBound: Ring.rings.length)
+        return Ring.rings[index]
     }
 
-    access(all) fun getRandomNumber(num: UInt64): UInt64 {
-        let randomNumber: UInt64 = revertibleRandom<UInt64>(modulo: UInt64.max)
-        let moduloResult = randomNumber % num
-        return moduloResult == 0 ? 0 : moduloResult - 1
+    access(self) fun getRandomHelmet(): String {
+        let index = Bag.generateRandomIndex(upperBound: Helmet.helmets.length)
+        return Helmet.helmets[index]
     }
 
-    // access(contract) fun getRarityScore(rarity:String): UInt64{
-    //     switch rarity {
-    //     case "Common":
-    //         return 1
-    //     case "Rare":
-    //         return 2
-    //     case "Epic":
-    //         return 3
-    //     case "Legendary":
-    //         return 5
-    //     default:
-    //         return 0
-    //     }
-    // }
+    access(self) fun generateRandomIndex(upperBound: Int): Int {
+        assert(upperBound > 0, message: "Upper bound must be greater than 0")
+        let randomValue: UInt64 = revertibleRandom<UInt64>()
+        return Int(randomValue % UInt64(upperBound))
+    }
 
-    // access(contract) fun calculateRarityScore(itemName: String): UInt64 {
-    //     let rarity = Rarity.rarity[itemName] ?? "Common"
-    //     var value = Bag.getRarityScore(rarity : rarity)
-    //     return value
-    // }
+    access(self) fun getRarityScoreValue(rarity: String): UInt64 {
+        switch rarity {
+            case "Common": return 1
+            case "Rare": return 2
+            case "Epic": return 3
+            case "Legendary": return 5
+            default: 
+                panic("Unknown rarity type: ".concat(rarity))
+        }
+    }
 
-    // access(contract) fun generateSVG(): String{
-    //     // var totalRarityScore: UInt64 = 0
-    //     var svg = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.bag { fill: white; font-family: serif; font-size: 14px; font-weight: bold} .base { fill: white; font-family: serif; font-size: 14px; } .title { fill: #ddd; font-family: Bookman; font-size: 10px; text-anchor: middle; }</style><rect width='100%' height='100%' fill='black' /><text x='175' y='340' class='title'>build-on-flow</text><text x='10' y='20' class='bag'>"
-    //     var bagName = "bag #"
-    //     svg = svg.concat(bagName)
-    //     var bagId = Bag.totalSupply
-    //     svg = svg.concat(bagId.toString()).concat("</text>").concat("<text x='10' y='60' class='base'>")
-    //     let background = Bag.getRandomBackground()
-    //     svg = svg.concat(background).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='80' class='base'>")
-    //     let type = Bag.getRandomTypes()
-    //     svg = svg.concat(type).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='100' class='base'>")
-    //     let cloth = Bag.getRandomCloth()
-    //     svg = svg.concat(cloth).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='120' class='base'>")
-    //     let weapon = Bag.getRandomWeapons()
-    //     svg = svg.concat(weapon).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='140' class='base'>")
-    //     let necklace = Bag.getRandomNecklace()
-    //     svg = svg.concat(necklace).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='160' class='base'>")
-    //     let ring = Bag.getRandomRing()
-    //     svg = svg.concat(ring).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='180' class='base'>")
-    //     let helmet = Bag.getRandomHelmet()
-    //     svg = svg.concat(helmet).concat("</text>")
-    //     svg = svg.concat("<text x='10' y='250' class='base'>")
-    //     let items = [background, type, cloth, weapon, necklace, ring, helmet]
-    //     // for item in items {
-    //     //     totalRarityScore = totalRarityScore + self.calculateRarityScore(itemName: item)
-    //     // }
-    //     // self.bagsRarityScore[bagId] = totalRarityScore
-    //     // svg = svg.concat("rarity score: ").concat(totalRarityScore.toString()).concat("</text>")
-    //     svg = svg.concat("</svg>")
-    //     return svg
-    // }
+    access(self) fun calculateRarityScore(itemName: String): UInt64 {
+        let rarity = Rarity.rarity[itemName] ?? "Common"
+        return Bag.getRarityScoreValue(rarity: rarity)
+    }
 
-    access(contract) fun generateSVG(): String {
-        var svg = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'>"
-        svg = svg.concat("<style>")
-        svg = svg.concat(".bag { fill: white; font-family: serif; font-size: 14px; font-weight: bold }")
-        svg = svg.concat(".base { fill: white; font-family: serif; font-size: 14px; }")
-        svg = svg.concat(".title { fill: #ddd; font-family: Bookman; font-size: 10px; text-anchor: middle; }")
-        svg = svg.concat("</style>")
-        svg = svg.concat("<rect width='100%' height='100%' fill='black' />")
-
-        // Title
-        svg = svg.concat("<text x='175' y='340' class='title'>build-on-flow</text>")
-
-        // Bag ID
-        svg = svg.concat("<text x='10' y='20' class='bag'>")
+    access(self) fun generateSVG(): String {
+        var totalRarityScore: UInt64 = 0
         let bagId = Bag.totalSupply
-        svg = svg.concat("bag #").concat(bagId.toString()).concat("</text>")
+        
+        var svgContent = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'>"
+        svgContent = svgContent.concat("<style>.bag { fill: white; font-family: serif; font-size: 14px; font-weight: bold} .base { fill: white; font-family: serif; font-size: 14px; } .title { fill: #ddd; font-family: Bookman; font-size: 10px; text-anchor: middle; }</style>")
+        svgContent = svgContent.concat("<rect width='100%' height='100%' fill='black' />")
+        svgContent = svgContent.concat("<text x='175' y='340' class='title'>build-on-flow</text>")
+        svgContent = svgContent.concat("<text x='10' y='20' class='bag'>bag #".concat(bagId.toString()).concat("</text>"))
+        
+        var background: String = ""
+        var body: String = ""
+        var cloth: String = ""
+        var weapon: String = ""
+        var glove: String = ""
+        var ring: String = ""
+        var helmet: String = ""
+        var traitsKey: String = ""
+        
+        var attempts = 0
+        let maxAttempts = 100
 
-        // Attributes
-        let background = Bag.getRandomBackground()
-        svg = svg.concat("<text x='10' y='60' class='base'>").concat(background).concat("</text>")
+        while attempts < maxAttempts {
+            attempts = attempts + 1
+            
+            background = Bag.getRandomBackground()
+            body = Bag.getRandomBody()
+            cloth = Bag.getRandomCloth()
+            weapon = Bag.getRandomWeapon()
+            glove = Bag.getRandomGlove()
+            ring = Bag.getRandomRing()
+            helmet = Bag.getRandomHelmet()
+            
+            traitsKey = Bag.generateTraitsKey(
+                background: background,
+                body: body,
+                cloth: cloth,
+                weapon: weapon,
+                glove: glove,
+                ring: ring,
+                helmet: helmet
+            )
+            
+            if !self.uniqueTraitsCombinations.contains(traitsKey) {
+                break
+            }
 
-        let type = Bag.getRandomTypes()
-        svg = svg.concat("<text x='10' y='80' class='base'>").concat(type).concat("</text>")
-
-        let cloth = Bag.getRandomCloth()
-        svg = svg.concat("<text x='10' y='100' class='base'>").concat(cloth).concat("</text>")
-
-        let weapon = Bag.getRandomWeapons()
-        svg = svg.concat("<text x='10' y='120' class='base'>").concat(weapon).concat("</text>")
-
-        let necklace = Bag.getRandomNecklace()
-        svg = svg.concat("<text x='10' y='140' class='base'>").concat(necklace).concat("</text>")
-
-        let ring = Bag.getRandomRing()
-        svg = svg.concat("<text x='10' y='160' class='base'>").concat(ring).concat("</text>")
-
-        let helmet = Bag.getRandomHelmet()
-        svg = svg.concat("<text x='10' y='180' class='base'>").concat(helmet).concat("</text>")
-
-        // Close SVG
-        svg = svg.concat("</svg>")
-        return svg
+            if attempts == maxAttempts {
+                panic("Failed to generate unique traits combination after ".concat(maxAttempts.toString()).concat(" attempts"))
+            }
+        }
+        
+        self.uniqueTraitsCombinations.append(traitsKey)
+        
+        // Add traits to SVG
+        let traits = [background, body, cloth, weapon, glove, ring, helmet]
+        var yPosition = 60
+        
+        for trait in traits {
+            svgContent = svgContent.concat("<text x='10' y='".concat(yPosition.toString()).concat("' class='base'>").concat(trait).concat("</text>"))
+            yPosition = yPosition +  20
+            totalRarityScore = totalRarityScore + self.calculateRarityScore(itemName: trait)
+        }
+        
+        // Store traits details
+        self.traitsDetails[bagId] = Bag.TraitsDetails(background:background, body:body, cloth:cloth, glove:glove, helmet:helmet, ring:ring, weapon:weapon)
+        self.bagRarityScores[bagId] = totalRarityScore
+        
+        // Add rarity score
+        svgContent = svgContent.concat("<text x='10' y='250' class='base'>rarity score: ".concat(totalRarityScore.toString()).concat("</text>"))
+        svgContent = svgContent.concat("</svg>")
+        
+        return svgContent
     }
 
-    access(all) fun mintNFT(addr:Address, payment: @FlowToken.Vault): @Bag.NFT {
+    access(self) fun generateTraitsKey(background: String, body: String, cloth: String, weapon: String, glove: String, ring: String, helmet: String): String {
+        return background.concat("|")
+            .concat(body).concat("|")
+            .concat(cloth).concat("|")
+            .concat(weapon).concat("|")
+            .concat(glove).concat("|")
+            .concat(ring).concat("|")
+            .concat(helmet)
+    }
+
+    access(self) fun createSVG(): String {
+        let svgImage = Bag.generateSVG()
+        let base64SVG = Base64Util.encode(svgImage)
+        return "data:image/svg+xml;base64,".concat(base64SVG)
+    }
+
+    access(all) fun mintNFT(payment: @FlowToken.Vault): @Bag.NFT {
         pre {
-            self.totalSupply < self.maxSupply - self.reservedSupply || self.team == addr : "There are no public NFTs left."
-            self.totalSupply + self.reservedMinted < self.maxSupply : "All NFTs are minted"
-            payment.balance >= self.bagPrice : "You don't have funds"
+            self.totalSupply < (self.maxSupply - self.reservedSupply): 
+                "Maximum supply reached. Total supply: ".concat(self.totalSupply.toString())
+            payment.balance >= self.mintPrice: 
+                "Insufficient payment. Required: ".concat(self.mintPrice.toString()).concat(", Provided: ").concat(payment.balance.toString())
         }
-        if(addr != self.team){
-            let contractReceiverRef = self.account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) ?? panic("Could not borrow receiver reference")
-            contractReceiverRef.deposit(from: <- payment)
-        }else{
-            self.reservedMinted = self.reservedMinted + 1
-            let owner = getAccount(addr).capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) ?? panic("Could not borrow receiver reference")
-            owner.deposit(from: <- payment)
-        }
+        
+        let contractReceiver = self.account.capabilities
+            .borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+            ?? panic("Contract Flow token receiver capability not found")
+        
+        contractReceiver.deposit(from: <- payment)
+        
         Bag.totalSupply = Bag.totalSupply + 1
-        var image = Bag.generateSVG()
-        var svgToBase64 = Bag.convertSVG(url: image)
-        var newSVG = "data:image/svg+xml;base64,".concat(svgToBase64)
-        var newNFT <- create NFT(id: Bag.totalSupply,svg: newSVG)
-        emit Minted(id: newNFT.id, svg: newNFT.svg)
+        let id = Bag.totalSupply
+        let svg = Bag.createSVG()
+        let rarityScore = self.bagRarityScores[id] 
+            ?? panic("Rarity score not found for NFT ID: ".concat(id.toString()))
+        
+        var newNFT <- create NFT(id: id, svg: svg, rarityScore: rarityScore)
+        emit NFTMinted(id: newNFT.id, svg: newNFT.svg)
+        
         return <- newNFT
     }
 
-    access(all) fun convertStringToBytes(input: String): [UInt8] {
-        return input.utf8
-    }
-
-    access(all) fun convertSVG(url:String): String {
-        var image = Bag.convertStringToBytes(input: url)
-        return Base64.encode(data: image)
+    access(all) fun resolveNFTTraits(nftId: UInt64): MetadataViews.Traits? {
+        if let traits = self.traitsDetails[nftId] {
+            let metadata: {String: AnyStruct} = {
+                "Background": traits.background,
+                "Body": traits.body,
+                "Cloth": traits.cloth,
+                "Glove": traits.glove,
+                "Helmet": traits.helmet,
+                "Ring": traits.ring,
+                "Weapon": traits.weapon
+            }
+            return MetadataViews.dictToTraits(dict: metadata, excludedNames: [])
+        }
+        return nil
     }
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
             Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+            Type<MetadataViews.NFTCollectionDisplay>(),
+            Type<MetadataViews.Royalties>()
         ]
     }
-
-    access(all) fun generateRewards
     
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
             case Type<MetadataViews.NFTCollectionData>():
-                let collectionData = MetadataViews.NFTCollectionData(
+                return MetadataViews.NFTCollectionData(
                     storagePath: self.CollectionStoragePath,
                     publicPath: self.CollectionPublicPath,
                     publicCollection: Type<&Bag.Collection>(),
@@ -389,7 +471,6 @@ access(all) contract Bag: NonFungibleToken {
                         return <-Bag.createEmptyCollection(nftType: Type<@Bag.NFT>())
                     })
                 )
-                return collectionData
             case Type<MetadataViews.NFTCollectionDisplay>():
 				let media = MetadataViews.Media(
 					file: MetadataViews.HTTPFile(
@@ -405,34 +486,118 @@ access(all) contract Bag: NonFungibleToken {
 				)
 				return MetadataViews.NFTCollectionDisplay(
 					name: "Bag Collection",
-					description: "Bag is a community-powered NFT that holds on-chain traits to build warrior identities — stake-backed, yield-generating, and made to give back to holders.",
-					externalURL: MetadataViews.ExternalURL("https://xyz.io"),
+					description: "Bag is an NFT that holds on-chain traits to build warrior identities — stake-backed, yield-generating, and made to give back to holders.",
+					externalURL: MetadataViews.ExternalURL("https://onchainbag.xyz"),
 					squareImage: media,
 					bannerImage: mediaBanner,
-					socials: {"twitter": MetadataViews.ExternalURL("https://x.com/flow")}
+					socials: {"twitter": MetadataViews.ExternalURL("https://x.com/onchainbag")}
 				)
+                case Type<MetadataViews.Royalties>():
+                    return MetadataViews.Royalties([])
+                default:
+                    return nil
         }
-        return nil
     }
 
-    init() {
-        self.totalSupply = 0
-        self.maxSupply = 6666
-        self.bagPrice = 120.0
-        self.bagsRarityScore = {}
+    /* --- View Functions --- */
+    access(all) view fun getFlowBalance(): UFix64 {
+        let vaultRef = self.account.capabilities
+            .borrow<&FlowToken.Vault>(/public/flowTokenBalance)
+            ?? panic("Flow token vault not found at /public/flowTokenBalance")
+        
+        return vaultRef.balance
+    }
 
-        self.team = 0x6d9e6334ddad7844
-        self.reservedSupply = 50
+    access(all) view fun getMintPrice(): UFix64 {
+        return self.mintPrice
+    }
+
+    access(all) view fun getTotalSupply(): UInt64 {
+        return self.totalSupply
+    }
+
+    access(all) view fun getMaxSupply(): UInt64 {
+        return self.maxSupply
+    }
+
+    access(all) view fun getReservedSupply(): UInt64 {
+        return self.reservedSupply
+    }
+
+    access(all) view fun getReservedMinted(): UInt64 {
+        return self.reservedMinted
+    }
+
+    access(all) view fun getTraitsDetails(nftId: UInt64): Bag.TraitsDetails? {
+        return self.traitsDetails[nftId]
+    }
+
+    access(all) view fun getBagRarityScore(nftId: UInt64): UInt64? {
+        return self.bagRarityScores[nftId]
+    }
+
+    access(all) view fun hasCollection(user: Address): Bool {
+        let account = getAccount(user)
+        return account.capabilities.get<&Bag.Collection>(Bag.CollectionPublicPath).check()
+    }
+
+    access(all) view fun getCollectionRef(user:Address): &Bag.Collection{
+        return getAccount(user).capabilities.get<&Bag.Collection>(Bag.CollectionPublicPath).borrow()?? panic("Cannot borrow collection reference")
+    }
+
+    access(all) view fun getCollectionSize(user: Address): [UInt64] {
+        pre {
+            self.hasCollection(user: user): "User does not have a Bag collection"
+        }
+
+        return self.getCollectionRef(user:user).getIDs()
+    }
+
+    access(all) view fun getCollectionNFTIds(user: Address): [UInt64] {
+        pre {
+            self.hasCollection(user: user): 
+                "User does not have a Bag collection"
+        } 
+        
+        return self.getCollectionRef(user:user).getIDs()
+    }
+
+    access(all) fun getNFTWinCount(ownerAddress: Address, nftId: UInt64): UInt64 {
+        let nft = Bag.borrowNFT(ownerAddress: ownerAddress, nftId: nftId)
+        return nft.winCount
+    }
+
+    access(all) fun getNFTRarityScore(ownerAddress: Address, nftId: UInt64): UInt64 {
+        let nft = Bag.borrowNFT(ownerAddress: ownerAddress, nftId: nftId)
+        return nft.rarityScore
+    }
+
+    init(owner: Address) {
+        self.totalSupply = 0
+        self.maxSupply = 7777
+        self.mintPrice = 150.0
+        self.traitsDetails = {}
+        self.bagRarityScores = {}
+        self.uniqueTraitsCombinations = []
+
+        self.owner = owner
+        self.reservedSupply = 100
         self.reservedMinted = 0
 
-        self.CollectionStoragePath = /storage/GullyBagCollection
-        self.CollectionPublicPath = /public/GullyBagCollection
+        self.CollectionStoragePath = /storage/BagCollection
+        self.CollectionPublicPath = /public/BagCollectionPublic
+        self.CollectionPrivatePath = /private/BagCollectionProvider
+        self.AdminStoragePath = /storage/BagAdmin
 
         let collection <- create Collection()
-        self.account.storage.save(<-collection, to: self.CollectionStoragePath)
+        self.account.storage.save(<- collection, to: self.CollectionStoragePath)
 
-        let collectionCap = self.account.capabilities.storage.issue<&{Bag.BagCollectionPublic}>(self.CollectionStoragePath)
-        self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
+        let admin <- create Admin()
+        self.account.storage.save(<- admin, to: self.AdminStoragePath)
+
+        let collectionCapability = self.account.capabilities.storage
+            .issue<&Bag.Collection>(Bag.CollectionStoragePath)
+        self.account.capabilities.publish(collectionCapability, at: self.CollectionPublicPath)
 
         emit ContractInitialized()
     }
