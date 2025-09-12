@@ -1,10 +1,12 @@
 import * as fcl from '@onflow/fcl';
 
 const GET_TOTAL_SUPPLY = `
-import Bag from 0xdb2133aaf990813c
+import Bag from 0x337e140cac71c1f0
+
 access(all) fun main(): UInt64 {
     return Bag.totalSupply
-}`;
+}
+`;
 
 export async function getTotalSupply() {
   try {
@@ -13,7 +15,7 @@ export async function getTotalSupply() {
     });
     return response;
   } catch (error) {
-    console.error('Error get bag total supply:', error);
+    console.error('Error in getting Bag total supply:', error);
     throw error;
   }
 }

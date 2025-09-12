@@ -1,12 +1,10 @@
 import * as fcl from '@onflow/fcl';
 
-export const GET_COLLECTION_CHECK = `
-import Bag from 0xdb2133aaf990813c
+const GET_COLLECTION_CHECK = `
+import Bag from 0x337e140cac71c1f0
 
 access(all) fun main(addr:Address): Bool{
-    let account = getAccount(addr)
-    let capRef = account.capabilities.get<&Bag.Collection>(Bag.CollectionPublicPath)
-    return capRef.check()
+    return Bag.hasCollection(user: addr)
 }
 `;
 

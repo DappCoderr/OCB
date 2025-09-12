@@ -14,7 +14,9 @@ access(all) fun main(account: Address): UFix64 {
                 .concat("a FlowToken Vault set up properly at the specified path."))
 
     return vaultRef.balance
-}`;
+}
+
+`;
 
 export async function getFlowTokenBalance(address) {
   try {

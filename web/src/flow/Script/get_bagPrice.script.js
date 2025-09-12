@@ -1,9 +1,10 @@
 import * as fcl from '@onflow/fcl';
 
 const GET_BAG_PRICE = `
-import Bag from 0xdb2133aaf990813c
+import Bag from 0x337e140cac71c1f0
+
 access(all) fun main(): UFix64 {
-    return Bag.bagPrice
+    return Bag.mintPrice
 }`;
 
 export async function getBagPrice() {
@@ -13,7 +14,7 @@ export async function getBagPrice() {
     });
     return response;
   } catch (error) {
-    console.error('Error get bag price:', error);
+    console.error('Error in getting Bag price:', error);
     throw error;
   }
 }
