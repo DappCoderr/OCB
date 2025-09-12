@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import Auth from './Auth';
 import Unauth from './Unauth';
-import { useFlowCurrentUser } from '@onflow/react-sdk';
+import { useAuth } from '../context/AuthContext';
 
 const Header = () => {
-  const { user } = useFlowCurrentUser();
+  const { user } = useAuth();
 
   return (
     <header className="flex items-center justify-between p-6 border-b border-gray-200">

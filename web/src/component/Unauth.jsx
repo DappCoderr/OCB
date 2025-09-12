@@ -1,7 +1,7 @@
-import { useFlowCurrentUser } from '@onflow/react-sdk';
+import { useAuth } from '../context/AuthContext';
 
 const Unauth = () => {
-  const { authenticate } = useFlowCurrentUser();
+  const { authenticate } = useAuth();
 
   return (
     <button
