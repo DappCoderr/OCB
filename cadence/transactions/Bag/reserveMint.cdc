@@ -2,7 +2,7 @@ import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
 import FlowToken from "../../contracts/interface/FlowToken.cdc"
 import Bag from "../../contracts/Bag.cdc"
 
-transaction(user:Address){
+transaction(user:Address, mintQty:UInt64){
 
     let adminRef: &Bag.Admin
     let collectionRef: &Bag.Collection
@@ -21,7 +21,13 @@ transaction(user:Address){
     }
 
     execute{
-        let nft <- self.adminRef.mintReservedNFT(recipient: user)
-        self.collectionRef.deposit(token: <- nft)
+        var i: UInt64 = 0
+        let pricePerMint = Bag.mintPrice
+
+        while i < mintQty {
+            let nft <- self.adminRef.mintReservedNFT(recipient: user)
+            self.collectionRef.deposit(token: <- nft)
+            i = i + 1
+        }
     }
 }                                                                               
