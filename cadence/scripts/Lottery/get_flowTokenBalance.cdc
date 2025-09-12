@@ -1,5 +1,5 @@
-import FungibleToken from "../contracts/interface/FungibleToken.cdc"
-import FlowToken from "../contracts/interface/FlowToken.cdc"
+import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
+import FlowToken from "../../contracts/interface/FlowToken.cdc"
 
 access(all) fun main(account: Address): UFix64 {
 
