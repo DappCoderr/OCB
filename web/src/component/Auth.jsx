@@ -1,21 +1,9 @@
 import { useState } from 'react';
-import { useFlowCurrentUser, useFlowAccount } from '@onflow/react-sdk';
+import { useAuth } from '../context/AuthContext';
 
 const Auth = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, authenticate, unauthenticate } = useFlowCurrentUser();
-
-  const {
-    data: account,
-    isLoading,
-    error,
-  } = useFlowAccount({
-    address: user?.addr,
-    query: {
-      staleTime: 5000,
-      enabled: !!user?.addr,
-    },
-  });
+  const { user, account, isLoading, error, unauthenticate } = useAuth();
 
   const formatBalance = (balance) => {
     if (!balance) return '0.00000000';
@@ -39,17 +27,6 @@ const Auth = () => {
       console.error('Failed to disconnect:', error);
     }
   };
-
-  if (!user?.loggedIn) {
-    return (
-      <button
-        onClick={authenticate}
-        className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-      >
-        Connect Wallet
-      </button>
-    );
-  }
 
   return (
     <div className="relative">
