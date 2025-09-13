@@ -23,16 +23,6 @@ const StakingInfo = () => {
           <span className="text-gray-600">APY: (approx)</span>
           <span className="font-semibold text-blue-600">11%</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Node ID:</span>
-          <span className="font-semibold text-blue-600">
-            {NODE_ID.slice(0, 4)}...{NODE_ID.slice(-4)}
-          </span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Node Type:</span>
-          <span className="font-semibold text-blue-600">{NODE_TYPE}</span>
-        </div>
       </div>
     </div>
   );
