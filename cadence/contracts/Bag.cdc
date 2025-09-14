@@ -5,6 +5,7 @@ import MetadataViews from "./interface/MetadataViews.cdc"
 import ViewResolver from "./interface/ViewResolver.cdc"
 
 import Base64Util from "./Base64Util.cdc"
+import BagRegistry from "./BagRegistry.cdc"
 
 import Background from "./components/Background.cdc"
 import Body from "./components/Body.cdc"
@@ -31,14 +32,16 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
 
     /* --- Contract State --- */
     access(all) var totalSupply: UInt64
-    access(all) let maxSupply: UInt64
-    access(all) let mintPrice: UFix64
+    access(all) var maxSupply: UInt64
+    access(all) var mintPrice: UFix64
     access(all) let reservedSupply: UInt64
     access(all) var reservedMinted: UInt64
     access(all) var traitsDetails: {UInt64: Bag.TraitsDetails}
     access(all) var bagRarityScores: {UInt64: UInt64} 
     access(all) var uniqueTraitsCombinations: [String]
+    access(all) let registryAddress: Address
     access(self) let owner: Address
+    
 
     access(all) struct TraitsDetails {
         access(all) var background: String
@@ -97,7 +100,9 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
             return [
                 Type<MetadataViews.Display>(),
                 Type<MetadataViews.ExternalURL>(),
+                Type<MetadataViews.Traits>(),
                 Type<MetadataViews.Royalties>(),
+                Type<MetadataViews.NFTView>(),
                 Type<MetadataViews.NFTCollectionData>(),
                 Type<MetadataViews.NFTCollectionDisplay>()
             ]
@@ -108,11 +113,13 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
                 case Type<MetadataViews.Display>():
                     return MetadataViews.Display(
                         name: "Bag # ".concat(self.id.toString()),
-                        description: "Bag is a fully on-chain NFT on Flow, crafted with Flow VRF randomness. Each Bag holds 7 unique traits, forming a one-of-a-kind warrior identity. But it’s more than art — all mint proceeds are staked, and the yield goes directly to holders. Bag is identity, utility, and rewards — all packed into a single Bag.",
+                        description: "Bag (OCB) is a fully on-chain GameFi asset built on the Flow blockchain, powered by Flow VRF randomness to ensure complete fairness. Each Bag contains 7 unique traits, forming a one-of-a-kind warrior identity. Bag is not just about art — every mint amount is staked into Flow nodes, generating real yield that flows back to holders. It's identity, utility, and rewards, all packed into a single Bag.",
                         thumbnail: MetadataViews.HTTPFile(url: self.getSVG())
                     ) 
                 case Type<MetadataViews.ExternalURL>():
                     return MetadataViews.ExternalURL("https://onchainbag.xyz")
+                case Type<MetadataViews.Traits>():
+                    return Bag.resolveNFTTraits(nftId: self.id)
                 case Type<MetadataViews.Royalties>():
                     let owner = getAccount(Bag.owner)
                     let cut = MetadataViews.Royalty(
@@ -122,6 +129,29 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
                     )
                     var royalties: [MetadataViews.Royalty] = [cut]
                     return MetadataViews.Royalties(royalties)
+                case Type<MetadataViews.NFTView>():
+                    let display = self.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
+                    let externalURL = self.resolveView(Type<MetadataViews.ExternalURL>())! as! MetadataViews.ExternalURL
+                    let collectionData = Bag.resolveContractView(
+                            resourceType: self.getType(),
+                            viewType: Type<MetadataViews.NFTCollectionData>()
+                        )! as! MetadataViews.NFTCollectionData
+                    let collectionDisplay = Bag.resolveContractView(
+                            resourceType: self.getType(),
+                            viewType: Type<MetadataViews.NFTCollectionDisplay>()
+                        )! as! MetadataViews.NFTCollectionDisplay
+                    let royalties = self.resolveView(Type<MetadataViews.Royalties>())! as! MetadataViews.Royalties
+                    let traits = self.resolveView(Type<MetadataViews.Traits>())! as! MetadataViews.Traits
+                    return MetadataViews.NFTView(
+                        id: self.id,
+                        uuid: self.uuid,
+                        display: display,
+                        externalURL: externalURL,
+                        collectionData: collectionData,
+                        collectionDisplay: collectionDisplay,
+                        royalties: royalties,
+                        traits: traits
+                    )
                 case Type<MetadataViews.NFTCollectionData>():
                     return Bag.resolveContractView(resourceType: Type<@NFT>(), viewType: Type<MetadataViews.NFTCollectionData>())
                 case Type<MetadataViews.NFTCollectionDisplay>():
@@ -161,9 +191,17 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
                 self.ownedNFTs.containsKey(withdrawID): 
                     "NFT with ID ".concat(withdrawID.toString()).concat(" not found in collection")
             }
-            
+
+            let owner = self.owner?.address!
             let token <- self.ownedNFTs.remove(key: withdrawID)!
-            emit NFTWithdrawn(id: token.id, from: self.owner?.address)
+            let id = token.id
+
+            // Call BagRegistry to unregister holder
+            if let ownerAddress = self.owner?.address {
+                let registryRef = getAccount(Bag.registryAddress).contracts.borrow<&BagRegistry>(name: "BagRegistry")
+                let _ = registryRef?.onNFTWithdrawn(bagId: id, from: owner)!
+            }
+            emit NFTWithdrawn(id: id, from: owner)
             return <- token
         }
 
@@ -188,6 +226,11 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
             let existingToken <- self.ownedNFTs[id] <- token
             emit NFTDeposited(id: id, to: self.owner?.address)
             destroy existingToken
+            // Call BagRegistry to register holder
+            if let ownerAddress = self.owner?.address {
+                let registryRef = getAccount(Bag.registryAddress).contracts.borrow<&BagRegistry>(name: "BagRegistry")
+                let _ = registryRef?.onNFTDeposited(bagId: id, to: ownerAddress)!
+            }
         }
 
         access(all) view fun getCollectionSize(): Int {
@@ -242,6 +285,14 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
             emit NFTMinted(id: newNFT.id, svg: newNFT.svg, mintedFor: recipient)
             
             return <- newNFT
+        }
+
+        access(all) fun setMaxValue(newValue:UInt64){
+            Bag.maxSupply = newValue
+        }
+
+        access(all) fun setMintPrice(newPrice:UFix64){
+            Bag.mintPrice = newPrice
         }
     }
 
@@ -464,10 +515,10 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         switch viewType {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
-                    storagePath: self.CollectionStoragePath,
-                    publicPath: self.CollectionPublicPath,
-                    publicCollection: Type<&Bag.Collection>(),
-                    publicLinkedType: Type<&Bag.Collection>(),
+                    storagePath: Bag.CollectionStoragePath,
+                    publicPath: Bag.CollectionPublicPath,
+                    publicCollection: Type<&Collection>(),
+                    publicLinkedType: Type<&Collection>(),
                     createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
                         return <-Bag.createEmptyCollection(nftType: Type<@Bag.NFT>())
                     })
@@ -487,13 +538,13 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
 				)
 				return MetadataViews.NFTCollectionDisplay(
 					name: "Bag Collection",
-					description: "Bag is an NFT that holds on-chain traits to build warrior identities — stake-backed, yield-generating, and made to give back to holders.",
+					description: "Own a Bag & get the chance to win weekly rewards and more",
 					externalURL: MetadataViews.ExternalURL("https://onchainbag.xyz"),
 					squareImage: media,
 					bannerImage: mediaBanner,
 					socials: {"twitter": MetadataViews.ExternalURL("https://x.com/onchainbag")}
 				)
-                case Type<MetadataViews.Royalties>():
+            case Type<MetadataViews.Royalties>():
                     return MetadataViews.Royalties([])
                 default:
                     return nil
@@ -573,7 +624,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         return nft.rarityScore
     }
 
-    init(owner: Address, mintPrice:UFix64, reserveSupply:UInt64) {
+    init(owner: Address, mintPrice:UFix64, reserveSupply:UInt64, registryAddress:Address) {
         self.totalSupply = 0
         self.maxSupply = 7777
         self.mintPrice = mintPrice
@@ -582,6 +633,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         self.uniqueTraitsCombinations = []
 
         self.owner = owner
+        self.registryAddress = registryAddress
         self.reservedSupply = reserveSupply
         self.reservedMinted = 0
 
