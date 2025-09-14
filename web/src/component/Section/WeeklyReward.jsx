@@ -73,8 +73,8 @@ const WeeklyReward = () => {
     // Constrain position within container bounds
     position = Math.max(0, Math.min(containerWidth, position));
 
-    // Calculate participants based on position (0 to 6666)
-    const newParticipants = Math.floor((position / containerWidth) * 6666);
+    // Calculate participants based on position (0 to 7777)
+    const newParticipants = Math.floor((position / containerWidth) * 7777);
     setParticipants(newParticipants);
 
     // Update handle position
@@ -93,8 +93,8 @@ const WeeklyReward = () => {
     // Constrain position within container bounds
     position = Math.max(0, Math.min(containerWidth, position));
 
-    // Calculate participants based on position (0 to 6666)
-    const newParticipants = Math.floor((position / containerWidth) * 6666);
+    // Calculate participants based on position (0 to 7777)
+    const newParticipants = Math.floor((position / containerWidth) * 7777);
     setParticipants(newParticipants);
 
     // Update handle position
@@ -119,7 +119,7 @@ const WeeklyReward = () => {
   useEffect(() => {
     if (containerRef.current && dragHandleRef.current) {
       const containerWidth = containerRef.current.getBoundingClientRect().width;
-      const position = (participants / 6666) * containerWidth;
+      const position = (participants / 7777) * containerWidth;
       dragHandleRef.current.style.left = `${position}px`;
     }
   }, []);
@@ -139,7 +139,7 @@ const WeeklyReward = () => {
           <span className="font-medium">
             Participants: {participants.toLocaleString()}
           </span>
-          <span>6666</span>
+          <span>7777</span>
         </div>
 
         <div
@@ -151,9 +151,9 @@ const WeeklyReward = () => {
               const containerWidth = containerRect.width;
               const position = e.clientX - containerRect.left;
 
-              // Calculate participants based on position (0 to 6666)
+              // Calculate participants based on position (0 to 7777)
               const newParticipants = Math.floor(
-                (position / containerWidth) * 6666
+                (position / containerWidth) * 7777
               );
               setParticipants(newParticipants);
 
@@ -173,12 +173,12 @@ const WeeklyReward = () => {
 
           <div
             className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
-            style={{ width: `${(participants / 6666) * 100}%` }}
+            style={{ width: `${(participants / 7777) * 100}%` }}
           ></div>
         </div>
 
         <div className="flex justify-between text-sm text-gray-500 mt-2">
-          <span>{Math.floor((participants / 6666) * 100)}% filled</span>
+          <span>{Math.floor((participants / 7777) * 100)}% filled</span>
           <span>Next draw: 2 days</span>
         </div>
 
