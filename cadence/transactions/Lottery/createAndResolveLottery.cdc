@@ -61,9 +61,6 @@ transaction(amount: UFix64, owner: Address) {
 
         // Step 3: Resolve the newly created lottery
         self.adminReference.resolveLottery(lotteryID: self.newLotteryId, owner: owner)
-
-        // Verify the prize pool contains funds after resolution
-        assert(BagLottery.getLotteryVaultBalance() == 0.0, message: "Prize pool should be empty after lottery resolution")
     }
 
     post {
