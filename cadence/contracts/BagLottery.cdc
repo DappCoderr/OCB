@@ -1,69 +1,51 @@
 import FungibleToken from "./interface/FungibleToken.cdc"
 import FlowToken from "./interface/FlowToken.cdc"
 import Bag from "./Bag.cdc"
+import BagRegistry from "./BagRegistry.cdc"
 
 access(all) contract BagLottery {
 
-    access(all) var totalLottery: UInt64
-    access(self) let lotteryVault: @FlowToken.Vault
-
     access(all) event LotteryCreated(lotteryID: UInt64)
     access(all) event PrizePoolFunded(amount: UFix64)
-    access(all) event LotteryResolved(lotteryID: UInt64, NFTId: UInt64)
-    access(all) event PrizeClaimed(lotteryID: UInt64, winnerAddress: Address, amount: UFix64)
+    access(all) event LotteryResolvedAndPrizeDistributed(lotteryID: UInt64, nftId: UInt64, winnerAddress: Address, amount: UFix64)
 
     access(all) let AdminStoragePath: StoragePath
 
+    access(all) var totalLottery: UInt64
+    access(self) let lotteryVault: @FlowToken.Vault
+    access(all) var winnerShare: UFix64
+    access(all) var teamShare: UFix64
+
+    /* --- Lottery Resource --- */
     access(all) resource Lottery {
         access(all) let id: UInt64
-        access(all) var winner_NFTId: UInt64
-        access(all) var prizeVault: @FlowToken.Vault
-        access(all) var winnerAddress: Address
+        access(all) var winnerNFTId: UInt64
+        access(all) var winnings: UFix64
+        access(all) var winnerAddress: Address?
         access(all) var isResolved: Bool
-        access(all) var prizeClaimed: Bool
-
+        access(all) var prizeDistributed: Bool
+        
         init() {
             self.id = BagLottery.totalLottery
-            self.winner_NFTId = 0
-            self.prizeVault <- FlowToken.createEmptyVault(vaultType: Type<@FlowToken.Vault>())
-            self.winnerAddress = 0x0
+            self.winnerNFTId = 0
+            self.winnings = 0.0
+            self.winnerAddress = nil
             self.isResolved = false
-            self.prizeClaimed = false
+            self.prizeDistributed = false
         }
 
-        access(all) fun setWinnerNFTId(newNFTId: UInt64) {
-            self.winner_NFTId = newNFTId
-        }
-
-        access(all) fun setWinnerAddress(winnerAddress: Address) {
-            self.winnerAddress = winnerAddress
+        access(all) fun updateLotteryDetails(nftId: UInt64, address: Address, amount:UFix64) {
+            pre {
+                !self.isResolved: "Details are already set!!"
+            }
+            self.winnerNFTId = nftId
+            self.winnerAddress = address
+            self.winnings = amount
+            self.prizeDistributed = true
         }
 
         access(all) fun markAsResolved() {
             self.isResolved = true
-        }
-
-        access(all) fun claimPrize(winnerAddress: Address) {
-            pre {
-                self.prizeVault.balance > 0.0: "No prize available to claim"
-                !self.prizeClaimed : "Prize claimed already"
-            }
-            
-            let prizeAmount = self.prizeVault.balance
-            let prizeVault <- self.prizeVault.withdraw(amount: prizeAmount)
-            
-            let winnerReceiver = getAccount(winnerAddress)
-                .capabilities
-                .borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) 
-                ?? panic("Could not borrow Flow token receiver reference")
-            
-            winnerReceiver.deposit(from: <- prizeVault)
-            self.setWinnerAddress(winnerAddress: winnerAddress)
-            self.prizeClaimed = true
-            let bagNFT = Bag.borrowNFT(ownerAddress: winnerAddress, nftId: self.winner_NFTId)
-            bagNFT.incrementWinCount()
-            
-            emit PrizeClaimed(lotteryID: self.id, winnerAddress: winnerAddress, amount: prizeAmount)
         }
     }
 
@@ -84,8 +66,7 @@ access(all) contract BagLottery {
         }
 
         access(all) fun resolveLottery(lotteryID: UInt64, owner:Address) {
-            let totalPrize = BagLottery.lotteryVault.balance
-            
+            let totalPrize = BagLottery.getLotteryVaultBalance()
             assert(totalPrize > 0.0, message: "Prize pool is empty")
 
             let lotteryRef = self.borrowLottery(lotteryID: lotteryID) 
@@ -93,31 +74,34 @@ access(all) contract BagLottery {
             
             assert(!lotteryRef.isResolved, message:"Lottery has already been resolved")
 
+            // Resolve lottery
             let totalNFTs = BagLottery.getBagTotalSupply()
-            let winner_NFTId = BagLottery.generateRandomNumber(upperBound: totalNFTs)
-            
-            lotteryRef.setWinnerNFTId(newNFTId: winner_NFTId)
 
-            // Distribute prizes: 80% to winner, 20% to bag team
-            let winnerPrizeAmount = totalPrize * 0.85
-            let winnerPrize <- BagLottery.lotteryVault.withdraw(amount: winnerPrizeAmount) 
-            // Deposit winner's prize into lottery prize vault
-            lotteryRef.prizeVault.deposit(from: <- winnerPrize)
+            // Get winning NFT
+            let winner_NFT_Id = BagLottery.generateRandomNumber(upperBound: totalNFTs)  
 
-            let bagTeamAmount = BagLottery.lotteryVault.balance
-            let bagTeamPrize <- BagLottery.lotteryVault.withdraw(amount: bagTeamAmount)
+            // Get winning NFT holder Address
+            let registerAddress = Bag.registryAddress
+            let registryRef = getAccount(registerAddress).contracts.borrow<&BagRegistry>(name: "BagRegistry") ?? panic("")
+            let winnerAddress = registryRef.getHolder(bagId: winner_NFT_Id)!
+
+            // Distribute prizes: 95% and 5%.
+            // Bag Team 5% for development + marketing
+            let bagTeamAmount = totalPrize * BagLottery.teamShare
+            let bagTeamVault <- BagLottery.lotteryVault.withdraw(amount: bagTeamAmount)
+            let bagTeamReceiver =  BagLottery.getFlowTokenReceiver(user:owner)
+            bagTeamReceiver.deposit(from: <- bagTeamVault)
+
+            // Winner         
+            let winnerAmount = totalPrize
+            let winnerVault <- BagLottery.lotteryVault.withdraw(amount: winnerAmount) 
+            let winnerReceiver = BagLottery.getFlowTokenReceiver(user:winnerAddress)          
+            winnerReceiver.deposit(from: <- winnerVault)
             
-            // Deposit owner share
-            let bagTeamReceiver = getAccount(owner)
-                .capabilities
-                .borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) 
-                ?? panic("Could not borrow bag team receiver reference")
-            
-            bagTeamReceiver.deposit(from: <- bagTeamPrize)
-            
+            lotteryRef.updateLotteryDetails(nftId: winner_NFT_Id, address: winnerAddress, amount:winnerAmount)
             lotteryRef.markAsResolved()
 
-            emit LotteryResolved(lotteryID: lotteryID, NFTId: winner_NFTId)
+            emit LotteryResolvedAndPrizeDistributed(lotteryID: lotteryID, nftId: winner_NFT_Id, winnerAddress: winnerAddress, amount: winnerAmount)
         }
 
         access(all) fun borrowLottery(lotteryID: UInt64): &Lottery? {
@@ -143,24 +127,16 @@ access(all) contract BagLottery {
             ?? panic("Could not borrow a reference to a Admin")
     }
 
-    access(all) fun claimPrize(claimerAddress: Address, lotteryID: UInt64) {
-        let lottery = self.borrowLottery(lotteryID: lotteryID)
-        
-        assert(lottery.isResolved, message: "Lottery has not been resolved yet")
-
-        let userNFTIds = Bag.getCollectionNFTIds(user: claimerAddress)
-        let winner_NFTId = lottery.winner_NFTId
-        
-        // Check if claimant owns the winning NFT
-        assert(userNFTIds.contains(winner_NFTId), message: "Claimer does not own the winning NFT")
-        
-        lottery.claimPrize(winnerAddress: claimerAddress)
+    access(all) fun updateShare(teamShare:UFix64, winnerShare:UFix64){
+        self.teamShare = teamShare
+        self.winnerShare = winnerShare
     }
     
     access(self) fun generateRandomNumber(upperBound: UInt64): UInt64 {
         assert(upperBound > 0, message: "Upper bound must be greater than 0")
         let randomValue: UInt64 = revertibleRandom<UInt64>()
-        return randomValue % upperBound
+        let rand = randomValue % upperBound
+        return rand == 0 ? 1 : rand
     }
 
     access(all) fun getAllLotteries(): [&BagLottery.Lottery]{
@@ -181,10 +157,20 @@ access(all) contract BagLottery {
         return BagLottery.lotteryVault.balance
     }
 
+    access(all) fun getFlowTokenReceiver(user:Address): &{FungibleToken.Receiver}{
+        return getAccount(user)
+        .capabilities
+        .borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) 
+        ?? panic("Could not borrow Bag Team Flow Token receiver reference")  
+    }
+
     init() {
         self.totalLottery = 0
         self.lotteryVault <- FlowToken.createEmptyVault(vaultType: Type<@FlowToken.Vault>())
         self.AdminStoragePath = /storage/BagLotteryAdmin
+
+        self.teamShare = 0.05
+        self.winnerShare = 0.95
 
         let admin: @Admin <- create Admin()
         self.account.storage.save(<- admin, to: self.AdminStoragePath)
