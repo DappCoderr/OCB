@@ -1,23 +1,26 @@
 import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
 import FlowToken from "../../contracts/interface/FlowToken.cdc"
+import NonFungibleToken from "../../contracts/interface/NonFungibleToken.cdc"
+import MetadataViews from "../../contracts/interface/MetadataViews.cdc"
 import Bag from "../../contracts/Bag.cdc"
 
 transaction(user:Address, mintQty:UInt64){
 
     let adminRef: &Bag.Admin
-    let collectionRef: &Bag.Collection
+    let recipientCollectionRef: &{NonFungibleToken.Receiver}
 
     prepare(signer: auth(Storage, Capabilities) &Account) {
 
-        if signer.storage.borrow<&Bag.Collection>(from: Bag.CollectionStoragePath) == nil {
-            signer.storage.save(<- Bag.createEmptyCollection(nftType: Type<@Bag.NFT>()), to: Bag.CollectionStoragePath)
-            let collectionCap = signer.capabilities.storage.issue<&Bag.Collection>(Bag.CollectionStoragePath)
-            signer.capabilities.publish(collectionCap, at: Bag.CollectionPublicPath) 
-        }
+         let collectionData = Bag.resolveContractView(resourceType: nil, viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData?
+            ?? panic("Could not resolve NFTCollectionData view. The ExampleNFT contract needs to implement the NFTCollectionData Metadata view in order to execute this transaction")
 
-        self.collectionRef = signer.storage.borrow<&Bag.Collection>(from: Bag.CollectionStoragePath) ?? panic("Could not found the collection")
+        self.recipientCollectionRef = getAccount(user).capabilities.borrow<&{NonFungibleToken.Receiver}>(collectionData.publicPath)
+            ?? panic("The recipient does not have a NonFungibleToken Receiver at "
+                    .concat(collectionData.publicPath.toString())
+                    .concat(" that is capable of receiving an NFT.")
+                    .concat("The recipient must initialize their account with this collection and receiver first!"))
+
         self.adminRef = signer.storage.borrow<&Bag.Admin>(from: Bag.AdminStoragePath) ?? panic("Could not found the Admin in storage")
-
     }
 
     execute{
@@ -26,7 +29,7 @@ transaction(user:Address, mintQty:UInt64){
 
         while i < mintQty {
             let nft <- self.adminRef.mintReservedNFT(recipient: user)
-            self.collectionRef.deposit(token: <- nft)
+            self.recipientCollectionRef.deposit(token: <- nft)
             i = i + 1
         }
     }
