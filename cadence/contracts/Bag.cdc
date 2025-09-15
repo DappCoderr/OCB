@@ -32,7 +32,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
 
     /* --- Contract State --- */
     access(all) var totalSupply: UInt64
-    access(all) var maxSupply: UInt64
+    access(all) let maxSupply: UInt64
     access(all) var mintPrice: UFix64
     access(all) let reservedSupply: UInt64
     access(all) var reservedMinted: UInt64
@@ -41,6 +41,11 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
     access(all) var uniqueTraitsCombinations: [String]
     access(all) let registryAddress: Address
     access(self) let owner: Address
+
+    /* --- Bonding Curve Constants --- */
+    access(all) let startPrice: UFix64
+    access(all) let maxPrice: UFix64
+    access(all) let availablePublicSupply: UInt64
     
 
     access(all) struct TraitsDetails {
@@ -267,10 +272,9 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
     access(all) resource Admin {
         access(all) fun mintReservedNFT(recipient: Address): @Bag.NFT {
             pre {
-                Bag.reservedSupply > Bag.reservedMinted: 
+                Bag.reservedMinted < Bag.reservedSupply : 
                     "No reserved NFTs available. Reserved supply: ".concat(Bag.reservedSupply.toString())
-                recipient == Bag.owner: 
-                    "Only contract owner can mint reserved NFTs"
+                recipient == Bag.owner: "Only contract owner can mint reserved NFTs"
             }
             
             Bag.totalSupply = Bag.totalSupply + 1
@@ -285,14 +289,6 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
             emit NFTMinted(id: newNFT.id, svg: newNFT.svg, mintedFor: recipient)
             
             return <- newNFT
-        }
-
-        access(all) fun setMaxValue(newValue:UInt64){
-            Bag.maxSupply = newValue
-        }
-
-        access(all) fun setMintPrice(newPrice:UFix64){
-            Bag.mintPrice = newPrice
         }
     }
 
@@ -624,10 +620,9 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         return nft.rarityScore
     }
 
-    init(owner: Address, mintPrice:UFix64, reserveSupply:UInt64, registryAddress:Address) {
+    init(owner: Address, reserveSupply:UInt64, registryAddress:Address) {
         self.totalSupply = 0
         self.maxSupply = 7777
-        self.mintPrice = mintPrice
         self.traitsDetails = {}
         self.bagRarityScores = {}
         self.uniqueTraitsCombinations = []
@@ -637,10 +632,18 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         self.reservedSupply = reserveSupply
         self.reservedMinted = 0
 
-        self.CollectionStoragePath = /storage/BagCollection
-        self.CollectionPublicPath = /public/BagCollectionPublic
-        self.CollectionPrivatePath = /private/BagCollectionProvider
-        self.AdminStoragePath = /storage/BagAdmin
+        // Bonding curve parameters
+        self.startPrice = 50.0
+        self.maxPrice = 150.0
+        self.availablePublicSupply = self.maxSupply - self.reservedSupply
+
+        // Set initial price
+        self.mintPrice = self.startPrice
+
+        self.CollectionStoragePath = /storage/BagCollections
+        self.CollectionPublicPath = /public/BagCollectionPublics
+        self.CollectionPrivatePath = /private/BagCollectionProviders
+        self.AdminStoragePath = /storage/BagAdmins
 
         let collection <- create Collection()
         self.account.storage.save(<- collection, to: self.CollectionStoragePath)
