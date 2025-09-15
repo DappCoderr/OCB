@@ -5,44 +5,49 @@ function FAQ() {
 
   const faqs = [
     {
-      question: 'What is OCB 0.1?',
+      question: 'What is OCB?',
       answer:
-        "OCB stands for On-Chain Bag, and 0.1 represents it's version. It's for who believe in Flow, NFTs, Rewards, and Community Owned Artworks — Just pure, on-chain identity built by and for the people.",
+        "Bag (OCB) is a fully on-chain GameFi asset, powered by Flow VRF randomness to ensure complete fairness. Each Bag contains 7 unique traits, forming a one-of-a-kind warrior identity. Bag is not just about art — every mint amount is staked into Flow nodes, generating real yield that flows back to holders. It's identity, utility, and rewards, all packed into a single Bag.",
     },
     {
-      question: 'How much does it cost to mint?',
+      question: 'How much does it cost to mint a Bag?',
       answer:
-        'Each NFT costs 120.0 FLOW to mint. You can mint up to 10 NFTs per transaction.',
+        'Each Bag costs 60.0 FLOW to mint. After every 1,111 NFTs minted, the mint price will increase by 10.0 FLOW.',
     },
     {
       question: 'What makes this project different?',
       answer:
-        'We prioritize true decentralization and community ownership. There are no platform restrictions, marketplace lock-ins. The art and ownership belong entirely to the community.',
+        "Unlike typical NFTs with zero utility. Bag gives you weekly reward. Redeem an avatar from your Bag to play in the upcoming game. Future Bag token airdrops may reward holders. Bag isn’t just art — it’s identity, utility, and rewards in one.",
     },
     {
-      question: 'Are there royalties?',
+      question: 'Are there royalties on secondary sales?',
       answer:
-        'Yes. A portion of secondary sales goes to the platform — and that share is also staked into the network to generate additional yield for the community.',
+        'Yes, a 5% royalty fee from all secondary marketplace sales goes to the Bag team, helping sustain the project and community.',
     },
     {
-      question: 'Can I transfer my NFTs?',
+      question: 'How does the Bag team earn',
       answer:
-        'Absolutely. Your NFTs are fully transferable with no restrictions. You can sell, trade, or gift them on any marketplace.',
+        'The Bag team has three revenue streams: 5% fee from weekly rewards, 5% royalty cut from secondary sales, 100 Bags reserved for the team, which also receive rewards. These funds are reinvested into development, marketing, and project growth.',
     },
     {
       question: 'What blockchain is this on?',
       answer:
-        'OCB 0.1 is built on Flow mainnet, ensuring maximum compatibility and decentralization.',
+        'Bag is built on Flow mainnet, ensuring maximum compatibility and decentralization.',
     },
     {
-      question: 'What happens after mint?',
+      question: 'How does staking work?',
       answer:
-        "Your NFT metadata is revealed immediately after minting. You'll own a unique piece of digital art that's permanently stored on the blockchain.",
+      "When a user mints a Bag, the mint amount is staked into Flow validator node. The staking generates weekly rewards, which are then distributed to one lucky holder through a Bag Lottery smart contract. This creates a game of chance where every Bag you hold gives you a shot at winning the weekly reward"
+    },
+    {
+      question: 'How does the staking amount grow over time?',
+      answer:
+      "Each week, 15% of the staking reward is automatically restaked (compounded). This increases the total stake, allowing the future weekly rewards to grow continuously."
     },
     {
       question: 'Is there a roadmap?',
       answer:
-        'We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable, community-driven collection that stands the test of time through genuine artistic value.',
+        'We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable collection that stands the test of time.',
     },
   ];
 
@@ -59,7 +64,7 @@ function FAQ() {
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
         <p className="text-gray-600 mb-6">
-          Everything you need to know about CryptoArt R1.
+          Everything you need to know about On-Chain-Bag.
           <br />
           Still have questions? Join our community discussions.
         </p>
