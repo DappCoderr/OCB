@@ -73,12 +73,6 @@ Bag combines **staking mechanics**, a **weekly lottery reward system**, and **fu
 
 ---
 
-## **🔐 License**
-
-This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
-
----
-
 ## **🌍 Links**
 
 * **Website:** [onchainbag.xyz](https://onchainbag.xyz/)
