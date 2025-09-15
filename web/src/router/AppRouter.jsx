@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Mint from '../pages/mint';
-import FAQ from '../component/FAQ';
+import FAQ from '../pages/FAQ';
 import History from '../pages/history';
 
 const AppRouter = () => (

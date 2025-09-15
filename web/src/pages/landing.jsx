@@ -1,5 +1,5 @@
 import HeroSection from '../component/section/HeroSection';
-import FAQSection from '../component/section/FAQSection';
+import FAQSection from './FAQSection';
 import BenefitsSection from '../component/section/BenefitsSection';
 import WhoIsOCBFor from '../component/section/WhoIsOCBFor';
 import HowItWorksSection from '../component/section/HowItWorksSection';
