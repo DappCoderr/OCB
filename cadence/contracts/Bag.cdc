@@ -23,6 +23,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
     access(all) event NFTWithdrawn(id: UInt64, from: Address?)
     access(all) event NFTDeposited(id: UInt64, to: Address?)
     access(all) event NFTMinted(id: UInt64, svg: String, mintedFor: Address)
+    access(all) event PriceUpdated(oldPrice: UFix64, newPrice: UFix64) 
 
     /* --- Storage Paths --- */
     access(all) let CollectionStoragePath: StoragePath
@@ -42,12 +43,10 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
     access(all) let registryAddress: Address
     access(self) let owner: Address
 
-    /* --- Bonding Curve Constants --- */
-    access(all) let startPrice: UFix64
-    access(all) let maxPrice: UFix64
-    access(all) let availablePublicSupply: UInt64
+    // Price update configuration
+    access(all) var priceUpdateInterval: UInt64
+    access(all) let priceIncreaseAmount: UFix64
     
-
     access(all) struct TraitsDetails {
         access(all) var background: String
         access(all) var body: String
@@ -290,6 +289,13 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
             
             return <- newNFT
         }
+
+        // Admin function to manually update price if needed
+        access(all) fun updateMintPrice(newPrice: UFix64) {            
+            let oldPrice = Bag.mintPrice
+            Bag.mintPrice = newPrice
+            emit PriceUpdated(oldPrice: oldPrice, newPrice: newPrice)
+        }
     }
 
     access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
@@ -479,8 +485,18 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         
         var newNFT <- create NFT(id: id, svg: svg, rarityScore: rarityScore)
         emit NFTMinted(id: newNFT.id, svg: newNFT.svg, mintedFor:user)
-        
+
+        if(Bag.totalSupply % Bag.priceUpdateInterval == 0 && Bag.totalSupply > 0){
+            self.updatePrice()
+        }
+
         return <- newNFT
+    }
+
+    access(self) fun updatePrice() {
+        let oldPrice = Bag.mintPrice
+        Bag.mintPrice = Bag.mintPrice + Bag.priceIncreaseAmount
+        emit PriceUpdated(oldPrice: oldPrice, newPrice: Bag.mintPrice)
     }
 
     access(all) fun resolveNFTTraits(nftId: UInt64): MetadataViews.Traits? {
@@ -620,9 +636,10 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         return nft.rarityScore
     }
 
-    init(owner: Address, reserveSupply:UInt64, registryAddress:Address) {
+    init(owner: Address, mintPrice:UFix64, reserveSupply:UInt64, registryAddress:Address) {
         self.totalSupply = 0
         self.maxSupply = 7777
+        self.mintPrice = mintPrice
         self.traitsDetails = {}
         self.bagRarityScores = {}
         self.uniqueTraitsCombinations = []
@@ -632,13 +649,10 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
         self.reservedSupply = reserveSupply
         self.reservedMinted = 0
 
-        // Bonding curve parameters
-        self.startPrice = 50.0
-        self.maxPrice = 150.0
-        self.availablePublicSupply = self.maxSupply - self.reservedSupply
-
-        // Set initial price
-        self.mintPrice = self.startPrice
+        // After each interval, mint price will increase by 10.0 Flow
+        // Giving benefit to early holders
+        self.priceUpdateInterval = 1111
+        self.priceIncreaseAmount = 10.0
 
         self.CollectionStoragePath = /storage/BagCollections
         self.CollectionPublicPath = /public/BagCollectionPublics
