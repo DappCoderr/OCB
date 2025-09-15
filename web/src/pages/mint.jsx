@@ -56,7 +56,7 @@ function Mint() {
           flowBalanceRes
         ] = await Promise.all([
           getCheckCollection(user.addr),
-          getFlowTokenBalance("0x337e140cac71c1f0")
+          getFlowTokenBalance("0x11106fe6700496e8")
         ]);
         
         setHasCollection(hasCollectionRes);
