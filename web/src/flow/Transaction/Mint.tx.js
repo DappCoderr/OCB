@@ -1,9 +1,9 @@
 import * as fcl from '@onflow/fcl';
 
 export const MINT = `
-import Bag from 0x337e140cac71c1f0
-import FungibleToken from 0x9a0766d93b6608b7
-import FlowToken from 0x7e60df042a9c0868
+import Bag from 0xBag
+import FungibleToken from 0xFungibleToken
+import FlowToken from 0xFlowToken
 
 transaction(user: Address, amount: UFix64, mintQty: UInt64) {
 
