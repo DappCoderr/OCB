@@ -1,7 +1,7 @@
 import * as fcl from '@onflow/fcl';
 
 const GET_BAG_WIN_COUNT = `
-import Bag from 0x337e140cac71c1f0
+import Bag from 0xBag
 
 access(all) fun main(user:Address, id:UInt64): UInt64 {
     return Bag.getNFTWinCount(ownerAddress: user, nftId: id)

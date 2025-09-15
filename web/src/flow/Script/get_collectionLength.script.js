@@ -1,7 +1,7 @@
 import * as fcl from '@onflow/fcl';
 
 const GET_COLLECTION_LENGTH = `
-import Bag from 0x337e140cac71c1f0
+import Bag from 0xBag
 
 access(all) fun main(addr:Address): Int{
     return Bag.getCollectionLength(user: addr)
