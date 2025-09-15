@@ -93,10 +93,14 @@ access(all) contract BagLottery {
             bagTeamReceiver.deposit(from: <- bagTeamVault)
 
             // Winner         
-            let winnerAmount = totalPrize
+            let remainingAmount = BagLottery.getLotteryVaultBalance()
+            let winnerAmount = remainingAmount
             let winnerVault <- BagLottery.lotteryVault.withdraw(amount: winnerAmount) 
             let winnerReceiver = BagLottery.getFlowTokenReceiver(user:winnerAddress)          
             winnerReceiver.deposit(from: <- winnerVault)
+
+            let bag = Bag.borrowNFT(ownerAddress: winnerAddress, nftId: winner_NFT_Id)
+            bag.incrementWinCount()
             
             lotteryRef.updateLotteryDetails(nftId: winner_NFT_Id, address: winnerAddress, amount:winnerAmount)
             lotteryRef.markAsResolved()
@@ -167,7 +171,7 @@ access(all) contract BagLottery {
     init() {
         self.totalLottery = 0
         self.lotteryVault <- FlowToken.createEmptyVault(vaultType: Type<@FlowToken.Vault>())
-        self.AdminStoragePath = /storage/BagLotteryAdmin
+        self.AdminStoragePath = /storage/BagLotteryAdmins
 
         self.teamShare = 0.05
         self.winnerShare = 0.95
