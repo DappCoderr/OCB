@@ -1,11 +1,18 @@
 import { config } from '@onflow/fcl';
 
-config()
-  .put("accessNode.api", "https://rest-testnet.onflow.org")
-  .put("flow.network", "testnet")
-  .put("app.detail.title", "OCB")
-  .put("app.detail.icon", "https://example.com/icon.png")
-  .put("app.detail.description", "OnChainBag")
-  .put("app.detail.url", "https://myonchainapp.com")
-  .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn")
-  .put("discovery.authn.include", []);
+config({
+  "accessNode.api": "https://rest-testnet.onflow.org",
+  "flow.network": "testnet",
+  "app.detail.title": "OCB",
+  "app.detail.icon": "https://example.com/icon.png",
+  "app.detail.description": "OnChainBag",
+  "app.detail.url": "https://myonchainapp.com",
+  "discovery.wallet": "https://fcl-discovery.onflow.org/testnet/authn",
+  "discovery.authn.include": [],
+  "0xBag": "0x11106fe6700496e8",
+  "0xBagRegistry": "0x11106fe6700496e8",
+  "0xBagLottery": "0x11106fe6700496e8",
+  "0xNonFungibleToken": "0x631e88ae7f1d7c20",
+  "0xFlowToken": "0x7e60df042a9c0868",
+  "0xFungibleToken": "0x9a0766d93b6608b7",
+})
