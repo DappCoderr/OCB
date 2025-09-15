@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as fcl from '@onflow/fcl';
 import { MINT } from '../flow/Transaction/Mint.tx';
+import { getFlowTokenBalance } from "../flow/Script/getFlowTokenBalance.script"
 import confetti from 'canvas-confetti';
 
 const MintInterface = ({
@@ -20,6 +21,8 @@ const MintInterface = ({
   const [error, setError] = useState(null);
   const [isMinting, setIsMinting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [userBalance, setUserBalance] = useState(0);
+  const [isCheckingBalance, setIsCheckingBalance] = useState(false);
 
   // Transaction status messages
   const statusMessages = {
@@ -30,6 +33,36 @@ const MintInterface = ({
     sealed: 'Transaction sealed and confirmed!',
     failed: 'Transaction failed'
   };
+
+  // Check user's FLOW balance
+  useEffect(() => {
+    const checkBalance = async () => {
+      if (!isWalletConnected) {
+        setUserBalance(0);
+        return;
+      }
+
+      setIsCheckingBalance(true);
+      try {
+        const user = await fcl.currentUser().snapshot();
+        if (user.addr) {
+          const balance = await getFlowTokenBalance(user.addr);
+          setUserBalance(balance);
+        }
+      } catch (error) {
+        console.error('Error checking FLOW balance:', error);
+        // Don't set an error state here as we don't want to block the UI
+      } finally {
+        setIsCheckingBalance(false);
+      }
+    };
+
+    checkBalance();
+  }, [isWalletConnected]);
+
+  // Calculate if user has enough balance
+  const totalCost = bagPrice * mintCount;
+  const hasSufficientBalance = userBalance >= totalCost;
 
   // Fire confetti animation
   const fireConfetti = () => {
@@ -240,20 +273,24 @@ const MintInterface = ({
             <span>{(bagPrice * mintCount).toFixed(2)} FLOW</span>
           </div>
         </div>
+        
         <button
           onClick={handleMint}
-          disabled={!isWalletConnected || isMinting}
+          disabled={!isWalletConnected || isMinting || !hasSufficientBalance}
           className={`w-full py-3 rounded font-bold transition-colors text-base ${
-            isWalletConnected && !isMinting
+            isWalletConnected && !isMinting && hasSufficientBalance
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >
           {isMinting
             ? 'Minting...'
-            : isWalletConnected
-              ? `Mint ${mintCount} NFT${mintCount > 1 ? 's' : ''}`
-              : 'Connect Wallet to Mint'}
+            : !isWalletConnected
+              ? 'Connect Wallet to Mint'
+              : !hasSufficientBalance
+                ? 'Insufficient Balance'
+                : `Mint ${mintCount} NFT${mintCount > 1 ? 's' : ''}`
+          }
         </button>
       </div>
 
