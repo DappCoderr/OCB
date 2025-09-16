@@ -1,13 +1,28 @@
+// import ContractInfo from './ContractInfo';
+// import StakingInfo from './StakingInfo';
+
+// const Sidebar = ({ flowBalance, contractBalance }) => {
+//   return (
+//     <div className="space-y-6">
+//       <ContractInfo contractBalance={contractBalance} flowBalance={flowBalance} />
+//       <StakingInfo />
+//     </div>
+//   );
+// };
+
+// export default Sidebar;
+
 import ContractInfo from './ContractInfo';
 import StakingInfo from './StakingInfo';
 
-const Sidebar = ({ contractBalance }) => {
+const Sidebar = ({ flowBalance, contractBalance }) => {
   return (
-    <div>
-      <div className="w-full lg:w-72 flex-shrink-0">
-        <ContractInfo contractBalance={contractBalance} />
-        <StakingInfo />
-      </div>
+    <div className="space-y-6">
+      <ContractInfo
+        contractBalance={contractBalance}
+        flowBalance={flowBalance}
+      />
+      <StakingInfo />
     </div>
   );
 };

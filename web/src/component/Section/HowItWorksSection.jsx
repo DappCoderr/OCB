@@ -18,10 +18,8 @@ const HowItWorksSection = () => {
                 <span className="text-2xl font-bold text-emerald-600">1</span>
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Mint Your Bag
-            </h3>
-            <p className="text-gray-600">Acquire an OCB NFT to get started.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">Mint</h3>
+            <p className="text-gray-600">Purchase your OCB NFT</p>
           </div>
 
           <div className="text-center">
@@ -33,9 +31,7 @@ const HowItWorksSection = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Auto-Staking
             </h3>
-            <p className="text-gray-600">
-              Minting amount is automatically staked into Flow Node.
-            </p>
+            <p className="text-gray-600">Mint amount staked into Flow Node</p>
           </div>
 
           <div className="text-center">
@@ -47,9 +43,7 @@ const HowItWorksSection = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Earn & Win
             </h3>
-            <p className="text-gray-600">
-              One Holder will get the change to win the staking reward
-            </p>
+            <p className="text-gray-600">Win the weekly yield raffle</p>
           </div>
         </div>
       </div>

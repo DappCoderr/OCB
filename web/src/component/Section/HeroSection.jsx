@@ -14,20 +14,20 @@ const HeroSection = () => {
         <div className="md:w-1/2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
             <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
-              MINT & WIN.
+              OWN & WIN.
             </span>
           </h1>
 
           <p className="text-lg text-gray-700 leading-relaxed mb-8">
-            Your NFT shouldn't just sit in a wallet —{' '}
+            NFT shouldn't just sit in a wallet —{' '}
             <span className="font-semibold text-green-600">
               it should work for you.{' '}
             </span>
-            With OCB, every mint amount is{' '}
+            With OCB, every mint price is{' '}
             <span className="font-semibold text-green-600">
               staked into Flow nodes
             </span>
-            , generating real yield and fueling a weekly{' '}
+            , generating real yield & fueling a weekly massive{' '}
             <span className="font-semibold text-green-600">REWARD 🎉</span>
           </p>
 

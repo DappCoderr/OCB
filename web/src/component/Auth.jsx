@@ -32,7 +32,7 @@ const Auth = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900"
+        className="flex items-center space-x-2 text-sm text-white"
       >
         <span>
           {user?.addr?.slice(0, 6)}...{user?.addr?.slice(-4)}

@@ -45,7 +45,7 @@ const WeeklyReward = () => {
   );
 
   const calculateWinAmount = (participantsCount) => {
-    return ((participantsCount * 150 * 10.5) / 100 / 52).toFixed(2);
+    return ((participantsCount * 60 * 11) / 100 / 52).toFixed(2);
   };
 
   const winAmount = calculateWinAmount(participants);
@@ -137,7 +137,7 @@ const WeeklyReward = () => {
         <div className="text-sm text-gray-500 mb-2 flex justify-between">
           <span>0</span>
           <span className="font-medium">
-            Participants: {participants.toLocaleString()}
+            NFTs: {participants.toLocaleString()}
           </span>
           <span>7777</span>
         </div>
@@ -177,9 +177,8 @@ const WeeklyReward = () => {
           ></div>
         </div>
 
-        <div className="flex justify-between text-sm text-gray-500 mt-2">
+        <div className="flex justify-center text-sm text-gray-500 mt-2">
           <span>{Math.floor((participants / 7777) * 100)}% filled</span>
-          <span>Next draw: 2 days</span>
         </div>
 
         <div className="text-xs text-gray-400 mt-1 text-center">
@@ -192,10 +191,10 @@ const WeeklyReward = () => {
           <div className="text-2xl font-bold text-emerald-600">
             {participants.toLocaleString()}
           </div>
-          <div className="text-xs text-gray-500">Participants</div>
+          <div className="text-xs text-gray-500">NFTs Minted</div>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-emerald-600">10.5%</div>
+          <div className="text-2xl font-bold text-emerald-600">11%</div>
           <div className="text-xs text-gray-500">APY</div>
         </div>
       </div>

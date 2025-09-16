@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { faqs } from '../../utils/constants';
+import Footer from '../Footer';
 
 const FAQSection = () => {
   const [activeFAQ, setActiveFAQ] = useState(null);
@@ -12,11 +13,8 @@ const FAQSection = () => {
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Frequently Asked Questions
+            FAQ
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Everything you need to know about OCB and how it works.
-          </p>
         </div>
 
         <div className="space-y-4">
@@ -52,57 +50,7 @@ const FAQSection = () => {
             </div>
           ))}
         </div>
-
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-6">
-            Still have questions? We're here to help!
-          </p>
-          <div className="flex justify-center space-x-4">
-            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-              X
-            </button>
-            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-              Email
-            </button>
-            <button
-              onClick={() =>
-                handleExternalLink(
-                  'https://contractbrowser.com/A.36e0dc989fe11d54.Bag'
-                )
-              }
-              className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-              aria-label="View smart contract"
-            >
-              contract
-            </button>
-          </div>
-        </div>
-
-        {/* <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-        <h3 className="font-bold mb-4">Still have questions?</h3>
-        <p className="text-gray-600 mb-4">
-          Join our community discussions or reach out directly.
-        </p>
-        <div className="flex justify-center space-x-4">
-          <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-            X
-          </button>
-          <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-            Email
-          </button>
-          <button
-            onClick={() =>
-              handleExternalLink(
-                'https://contractbrowser.com/A.36e0dc989fe11d54.Bag'
-              )
-            }
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-            aria-label="View smart contract"
-          >
-            contract
-          </button>
-        </div>
-      </div> */}
+        <Footer />
       </div>
     </section>
   );

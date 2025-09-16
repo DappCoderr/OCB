@@ -7,8 +7,8 @@ const BenefitsSection = () => {
             Why own OCB?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            OCB isn’t just NFT — it’s unlocking identity, rewards, and
-            opportunity to a life-chaneging wins.
+            OCB unlocks access, generates rewards, and opens the door to
+            life-changing wins. All verifiably on-chain.
           </p>
         </div>
 
@@ -32,7 +32,7 @@ const BenefitsSection = () => {
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Earn</h3>
             <p className="text-gray-600">
-              Automatically stake mint amount, generating real yield.
+              Your mint price is staked, generating passive yield.
             </p>
           </div>
 
@@ -57,8 +57,7 @@ const BenefitsSection = () => {
               Weekly Reward
             </h3>
             <p className="text-gray-600">
-              One lucky holder wins REWARD, while everyone else continues to
-              grow their stake.
+              One lucky holder wins a weekly prize.
             </p>
           </div>
 
@@ -83,8 +82,7 @@ const BenefitsSection = () => {
               True On-Chain
             </h3>
             <p className="text-gray-600">
-              Bag is fully on-chain verifiable, and transferable — you control
-              it, trade it, or use it in future.
+              Fully on-chain, verifiable, and transferable.
             </p>
           </div>
 
@@ -108,10 +106,7 @@ const BenefitsSection = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Community Growth
             </h3>
-            <p className="text-gray-600">
-              Supports Flow node infrastructure, making the network stronger and
-              more decentralized.
-            </p>
+            <p className="text-gray-600">Supports Flow Network</p>
           </div>
         </div>
       </div>

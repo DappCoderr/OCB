@@ -2,44 +2,37 @@ import { Link } from 'react-router-dom';
 import Auth from './Auth';
 import Unauth from './Unauth';
 import { useAuth } from '../context/AuthContext';
+import Bag from '../assets/logo.svg';
 
 const Header = () => {
   const { user } = useAuth();
 
   return (
-    <header className="flex items-center justify-between p-6 border-b border-gray-200">
-      {/* Left side: Logo + Links */}
-      <div className="flex items-center space-x-6">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-lg font-bold hover:text-gray-600 transition-colors"
-        >
-          OCB 0.1
-        </Link>
-
-        {/* Show these links only if logged in */}
-        {user?.loggedIn && (
-          <>
-            <Link
-              to="/history"
-              className="hover:text-gray-600 transition-colors"
-            >
-              History
+    <header className="px-6 py-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between bg-[#12141D] rounded-2xl px-6 py-2 shadow-lg border border-[#2A2D3A]">
+          {/* Left side: Logo + Links */}
+          <div className="flex items-center space-x-6">
+            <Link to="/" className="flex items-center space-x-3">
+              <img src={Bag} alt="Bag Logo" className="h-14 w-14" />
             </Link>
-            <Link
-              to="/faq"
-              className="hover:text-gray-600 transition-colors"
-            >
-              FAQ
-            </Link>
-          </>
-        )}
-      </div>
 
-      {/* Right side: Auth / Unauth */}
-      <div className="flex items-center space-x-4">
-        {user?.loggedIn ? <Auth /> : <Unauth />}
+            {/* Keep navigation links in header */}
+            {user?.loggedIn && (
+              <div className="flex space-x-6 ml-4">
+                <Link to="/lottery" className="text-white transition-colors">
+                  Lottery
+                </Link>
+                <Link to="/faq" className="text-white transition-colors">
+                  FAQ
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Right side: Auth */}
+          <div>{user?.loggedIn ? <Auth /> : <Unauth />}</div>
+        </div>
       </div>
     </header>
   );

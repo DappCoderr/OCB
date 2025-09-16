@@ -77,10 +77,6 @@ const WhoIsOCBFor = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Who Is OCB For?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Whether you’re here to collect, trade, or grow your portfolio, OCB
-            has something for everyone.
-          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
