@@ -67,7 +67,11 @@ export async function mintNFT(user, amount, mintQty) {
   try {
     const response = await fcl.mutate({
       cadence: MINT,
-      args: (arg, t) => [arg(user, t.Address), arg(amount, t.UFix64), arg(mintQty, t.UInt64)],
+      args: (arg, t) => [
+        arg(user, t.Address),
+        arg(amount, t.UFix64),
+        arg(mintQty, t.UInt64),
+      ],
       payer: fcl.authz,
       proposer: fcl.authz,
       authorizations: [fcl.authz],

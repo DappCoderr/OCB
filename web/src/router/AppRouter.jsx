@@ -6,7 +6,7 @@ import History from '../pages/history';
 const AppRouter = () => (
   <Routes>
     <Route path="/" element={<Mint />} />
-    <Route path="/history" element={<History />} />
+    <Route path="/lottery" element={<History />} />
     <Route path="/faq" element={<FAQ />} />
   </Routes>
 );

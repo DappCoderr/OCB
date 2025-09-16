@@ -33,10 +33,10 @@ export const AuthProvider = ({ children }) => {
 
   const fetchAccountData = async () => {
     if (!user?.addr) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const accountData = await fcl.account(user.addr);
       setAccount(accountData);
@@ -73,12 +73,8 @@ export const AuthProvider = ({ children }) => {
     error,
     authenticate,
     unauthenticate,
-    refetchAccount: fetchAccountData
+    refetchAccount: fetchAccountData,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
