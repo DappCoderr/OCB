@@ -5,6 +5,7 @@ import { MINT } from '../flow/Transaction/Mint.tx';
 import { getFlowTokenBalance } from '../flow/Script/getFlowTokenBalance.script';
 import { getCollectionLength } from '../flow/Script/get_collectionLength.script';
 import confetti from 'canvas-confetti';
+import { FlowIcon } from './FlowIcon';
 
 const MintInterface = ({
   setMintCount,
@@ -279,7 +280,7 @@ const MintInterface = ({
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setMintCount(Math.max(minMint, mintCount - 1))}
-              className="w-9 h-9 border border-[#2A2D3A] bg-[#232734] rounded-lg hover:bg-[#2A2D3A] transition-colors font-bold flex items-center justify-center"
+              className="w-9 h-9 border border border-white bg-white rounded-lg hover:bg-gray-300 hover:border-black transition-colors font-bold flex items-center justify-center"
               disabled={isMinting || maxNFTsReached}
             >
               -
@@ -289,7 +290,7 @@ const MintInterface = ({
             </span>
             <button
               onClick={() => setMintCount(Math.min(maxMint, mintCount + 1))}
-              className="w-9 h-9 border border-white bg-white rounded-lg hover:bg-[#2A2D3A] transition-colors font-bold flex items-center justify-center"
+              className="w-9 h-9 border border-white bg-white rounded-lg hover:bg-gray-300 hover:border-black transition-colors font-bold flex items-center justify-center"
               disabled={isMinting || maxNFTsReached}
             >
               +
@@ -307,12 +308,12 @@ const MintInterface = ({
         <div className="border-t border-[#2A2D3A] pt-4 mb-6">
           <div className="flex items-center justify-between text-lg font-bold">
             <span className="text-gray-300">Total:</span>
-            <span className="text-white">{bagPrice * mintCount} FLOW</span>
+            <span className="text-white flex gap-2">{bagPrice * mintCount}.0 <FlowIcon height={28}/> </span>
           </div>
 
           {isWalletConnected && (
             <div className="mt-2 text-sm text-gray-400">
-              Your balance: {userBalance} FLOW
+              Your balance: {Math.floor(userBalance).toLocaleString()} FLOW
               {!hasSufficientBalance && (
                 <span className="text-red-400 ml-2">
                   (Insufficient balance)
