@@ -53,11 +53,11 @@ const MintInterface = ({
           // Get user's FLOW balance
           const balance = await getFlowTokenBalance(user.addr);
           setUserBalance(balance);
-          
+
           // Get user's NFT collection length
           const nftCount = await getCollectionLength(user.addr);
           setUserNFTCount(nftCount);
-          
+
           // Check if user has reached the maximum (20 NFTs)
           setMaxNFTsReached(nftCount >= 20);
         }
@@ -308,7 +308,9 @@ const MintInterface = ({
         <div className="border-t border-[#2A2D3A] pt-4 mb-6">
           <div className="flex items-center justify-between text-lg font-bold">
             <span className="text-gray-300">Total:</span>
-            <span className="text-white flex gap-2">{bagPrice * mintCount}.0 <FlowIcon height={28}/> </span>
+            <span className="text-white flex gap-2">
+              {bagPrice * mintCount}.0 <FlowIcon height={28} />{' '}
+            </span>
           </div>
 
           {isWalletConnected && (
@@ -326,9 +328,7 @@ const MintInterface = ({
             <div className="mt-1 text-sm text-gray-400">
               Your NFTs: {userNFTCount}/20
               {maxNFTsReached && (
-                <span className="text-red-400 ml-2">
-                  (Maximum reached)
-                </span>
+                <span className="text-red-400 ml-2">(Maximum reached)</span>
               )}
             </div>
           )}
@@ -350,8 +350,8 @@ const MintInterface = ({
         {maxNFTsReached && (
           <div className="mt-4 p-3 bg-red-900/30 border border-red-700/50 rounded-lg">
             <p className="text-sm text-red-300 text-center">
-              You've reached the maximum of 20 NFTs per wallet. 
-              You cannot mint more NFTs from this wallet.
+              You've reached the maximum of 20 NFTs per wallet. You cannot mint
+              more NFTs from this wallet.
             </p>
           </div>
         )}

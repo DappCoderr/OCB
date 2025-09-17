@@ -92,7 +92,7 @@ const WeeklyReward = () => {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-bold text-gray-900">Weekly Reward</h3>
         <div className="px-3 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded-full flex items-center gap-2">
-          {winAmount} <FlowIcon width={20} height={20}/>
+          {winAmount} <FlowIcon width={20} height={20} />
         </div>
       </div>
 

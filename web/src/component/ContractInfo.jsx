@@ -1,4 +1,4 @@
-import { FlowIcon } from "./FlowIcon"
+import { FlowIcon } from './FlowIcon';
 
 const ContractInfo = ({ contractBalance }) => {
   return (
@@ -14,7 +14,7 @@ const ContractInfo = ({ contractBalance }) => {
             {contractBalance !== null
               ? Math.floor(contractBalance).toLocaleString()
               : '-'}{' '}
-            <FlowIcon width={18} height={22}/>
+            <FlowIcon width={18} height={22} />
           </p>
         </div>
       </div>

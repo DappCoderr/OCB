@@ -54,4 +54,3 @@ export const faqs = [
       'We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable collection that stands the test of time.',
   },
 ];
-
