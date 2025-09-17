@@ -19,9 +19,14 @@ export const faqs = [
       'Each Bag costs 60.0 FLOW to mint. After every 1,111 NFTs minted, the mint price will increase by 10.0 FLOW.',
   },
   {
+    question: 'How does the staking amount grow over time?',
+    answer:
+      'Each week, 15% of the staking reward is automatically restaked (compounded). This increases the total stake, allowing the future weekly rewards to grow continuously.',
+  },
+  {
     question: 'What makes this project different?',
     answer:
-      'Unlike typical NFTs with zero utility. Bag gives you weekly reward. Redeem an avatar from your Bag to play in the upcoming game. Future Bag token airdrops may reward holders. Bag isn’t just art — it’s identity, utility, and rewards in one.',
+      'Unlike typical NFTs with zero utility. Bag gives you weekly reward. Redeem an avatar from your Bag to play in the upcoming game. Future Bag token airdrops may reward holders. Bag isn’t just art — it’s identity, utility, and rewards all in one.',
   },
   {
     question: 'Are there royalties on secondary sales?',
@@ -44,13 +49,9 @@ export const faqs = [
       'When a user mints a Bag, the mint amount is staked into Flow validator node. The staking generates weekly rewards, which are then distributed to one lucky holder through a Bag Lottery smart contract. This creates a game of chance where every Bag you hold gives you a shot at winning the weekly reward',
   },
   {
-    question: 'How does the staking amount grow over time?',
-    answer:
-      'Each week, 15% of the staking reward is automatically restaked (compounded). This increases the total stake, allowing the future weekly rewards to grow continuously.',
-  },
-  {
     question: 'Is there a roadmap?',
     answer:
       'We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable collection that stands the test of time.',
   },
 ];
+
