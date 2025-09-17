@@ -1,12 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
 import Mint from '../pages/mint';
 import FAQ from '../pages/FAQ';
-import History from '../pages/history';
+import Lottery from '../pages/lottery';
 
 const AppRouter = () => (
   <Routes>
     <Route path="/" element={<Mint />} />
-    <Route path="/lottery" element={<History />} />
+    <Route path="/lottery" element={<Lottery />} />
     <Route path="/faq" element={<FAQ />} />
   </Routes>
 );
