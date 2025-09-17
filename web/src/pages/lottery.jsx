@@ -236,12 +236,41 @@ function Lottery() {
     <main className=" px-6 py-8">
       <div className="max-w-7xl mx-auto bg-black rounded-2xl">
         <div className="px-8 py-10">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Lottery</h1>
-            <p className="text-gray-400">
-              Track all past lotteries and their outcomes
-            </p>
+          <div className="relative mb-8">
+            {/* Provably Fair Badge - absolutely positioned */}
+            <div className="absolute top-0 left-0">
+              <div className="text-white text-xs flex items-center w-50 p-1 border border-white rounded-lg">
+                <div className="p-2 border-r hidden md:inline-block">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-shield-check"
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                </div>
+                <div className="flex flex-col p-2">
+                  <span>Provably Fair.</span>
+                  <span className="text-xs">100% on-chain</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Title Section */}
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-white mb-2">Lottery</h1>
+              <p className="text-gray-400">
+                Track all past lotteries and their outcomes
+              </p>
+            </div>
           </div>
 
           {/* Stats Summary */}
