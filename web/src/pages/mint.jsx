@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCurrentFlowUser } from '@onflow/kit';
-import { mintNFT } from '../flow/Transaction/Mint.tx';
+import { mintNFT } from '../flow/Transaction/MintBag.tx';
 import { parseFlowError } from '../utils/parseFlowError';
 
 import Sidebar from '../component/Sidebar';
