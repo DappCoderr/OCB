@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import * as fcl from '@onflow/fcl';
-import { MINT } from '../flow/Transaction/Mint.tx';
+import { MINT } from '../flow/Transaction/MintBag.tx';
 import { getFlowTokenBalance } from '../flow/Script/getFlowTokenBalance.script';
 import { getCollectionLength } from '../flow/Script/get_collectionLength.script';
 import confetti from 'canvas-confetti';
