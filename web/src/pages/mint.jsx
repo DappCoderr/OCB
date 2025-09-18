@@ -154,7 +154,6 @@ function Mint() {
           {/* Left Sidebar */}
           <div className="w-full lg:w-1/4">
             <Sidebar
-              flowBalance={flowBalance}
               contractBalance={contractBalance}
             />
           </div>
