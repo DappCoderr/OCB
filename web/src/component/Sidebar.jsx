@@ -1,12 +1,10 @@
 import ContractInfo from './ContractInfo';
 import StakingInfo from './StakingInfo';
 
-const Sidebar = ({contractBalance }) => {
+const Sidebar = ({ contractBalance }) => {
   return (
     <div className="space-y-6">
-      <ContractInfo
-        contractBalance={contractBalance}
-      />
+      <ContractInfo contractBalance={contractBalance} />
       <StakingInfo />
     </div>
   );

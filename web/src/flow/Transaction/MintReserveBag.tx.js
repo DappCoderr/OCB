@@ -1,4 +1,3 @@
-
 import * as fcl from '@onflow/fcl';
 
 export const RESERVE_MINT = `
@@ -38,7 +37,7 @@ transaction(user:Address, mintQty:UInt64){
         }
     }
 } 
-`                                                                     
+`;
 
 export async function mintReserve(user, mintQy) {
   try {

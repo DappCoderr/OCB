@@ -19,7 +19,7 @@ transaction(nodeID: String, delegatorID: UInt32?, amount: UFix64) {
         self.stakingCollectionRef.stakeRewardedTokens(nodeID: nodeID, delegatorID: delegatorID, amount: amount)
     }
 }
-` 
+`;
 
 export async function restakeReward(nodeId, delegateId, amount) {
   try {

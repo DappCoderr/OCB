@@ -73,7 +73,7 @@ transaction(amount: UFix64, owner: Address) {
             "Lottery creation verification failed. Total lotteries should be ".concat((self.newLotteryId).toString())
     }
 }
-`                                                                     
+`;
 
 export async function resolveLottery(amount, owner) {
   try {
