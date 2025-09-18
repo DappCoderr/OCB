@@ -1,4 +1,4 @@
-const WITHDRAW_DELEGATE_REWARD = `
+const WITHDRAW_REWARD = `
 import FlowStakingCollection from 
 
 /// Request to withdraw rewarded tokens for the specified node or delegator in the staking collection
@@ -23,7 +23,7 @@ transaction(nodeID: String, delegatorID: UInt32?, amount: UFix64) {
 export async function withdrawReward(nodeId, delegateId, amount) {
   try {
     const response = await fcl.mutate({
-      cadence: WITHDRAW_DELEGATE_REWARD,
+      cadence: WITHDRAW_REWARD,
       args: (arg, t) => [arg(nodeId, t.String)],
       args: (arg, t) => [arg(delegateId, t.UInt32)],
       args: (arg, t) => [arg(amount, t.UFix64)],
