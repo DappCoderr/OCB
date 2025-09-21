@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef } from 'react';
 
-// Transaction status state machine
 const TRANSACTION_STATUS = {
   IDLE: 'idle',
   PENDING: 'pending',
