@@ -63,9 +63,9 @@ transaction(user: Address, amount: UFix64, mintQty: UInt64) {
 
 `;
 
-export async function mintNFT(user, amount, mintQty) {
+export const mintNFT = async (user, amount, mintQty) => {
   try {
-    const response = await fcl.mutate({
+    const transactionId = await fcl.mutate({
       cadence: MINT,
       args: (arg, t) => [
         arg(user, t.Address),
@@ -77,18 +77,18 @@ export async function mintNFT(user, amount, mintQty) {
       authorizations: [fcl.authz],
       limit: 999,
     });
-    const res = await fcl.tx(response).onceSealed();
-    return res;
+
+    return transactionId;
   } catch (error) {
-    // Robust error handling
     const msg =
       (typeof error === 'string' && error) ||
       (error && error.message) ||
       (error && error.errorMessage) ||
       'Transaction failed';
+
     if (msg.toLowerCase().includes('declined')) {
       throw new Error('User denied transaction');
     }
     throw new Error(msg);
   }
-}
+};
