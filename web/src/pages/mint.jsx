@@ -1,92 +1,308 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCurrentFlowUser } from '@onflow/kit';
-import { mintNFT } from '../flow/Transaction/MintBag.tx';
-import { parseFlowError } from '../utils/parseFlowError';
-
+import * as fcl from '@onflow/fcl';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from '../component/Sidebar';
 import AdditionalInfo from '../component/AdditionalInfo';
 import MintInterface from '../component/MintInterface';
+import MintingModal from '../component/MintingModal';
 import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 
 import { getTotalSupply } from '../flow/Script/get_totalSupply.script';
 import { getCheckCollection } from '../flow/Script/get_checkCollection.script';
 import { getBagPrice } from '../flow/Script/get_bagPrice.script';
 import { getFlowTokenBalance } from '../flow/Script/getFlowTokenBalance.script';
 import { getMaxSupply } from '../flow/Script/get_maxSupply.script';
+import { getCollectionLength } from '../flow/Script/get_collectionLength.script';
+import { mintNFT } from '../flow/Transaction/MintBag.tx';
+import { parseFlowError } from '../utils/parseFlowError';
+import Footer from '../component/Footer';
+
+// Confetti function
+const fireConfetti = () => {
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#00ef8b', '#0090ff', '#ff00aa', '#ffd700', '#00e5ff'],
+  });
+
+  setTimeout(() => {
+    confetti({
+      particleCount: 100,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 },
+    });
+  }, 250);
+
+  setTimeout(() => {
+    confetti({
+      particleCount: 100,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 },
+    });
+  }, 400);
+};
+
+// Transaction status state machine
+const TRANSACTION_STATUS = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  FINALIZED: 'finalized',
+  EXECUTED: 'executed',
+  SEALED: 'sealed',
+  FAILED: 'failed',
+  CANCELLED: 'cancelled',
+  DECLINED: 'declined',
+};
 
 function Mint() {
   const { user } = useCurrentFlowUser();
-  const [mintCount, setMintCount] = useState(1);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const queryClient = useQueryClient();
+  const [mintingModalOpen, setMintingModalOpen] = useState(false);
+  const [transactionStatus, setTransactionStatus] = useState(
+    TRANSACTION_STATUS.IDLE
+  );
+  const [transactionId, setTransactionId] = useState(null);
+  const [mintError, setMintError] = useState(null);
   const [lastMintedCount, setLastMintedCount] = useState(0);
-  const [minting, setMinting] = useState(false);
+  const [transactionSubmitted, setTransactionSubmitted] = useState(false);
 
-  // State for contract data
-  const [totalSupply, setTotalSupply] = useState(null);
-  const [hasCollection, setHasCollection] = useState(false);
-  const [bagPrice, setBagPrice] = useState(0);
-  const [flowBalance, setFlowBalance] = useState(0);
-  const [contractBalance, setContractBalance] = useState(0);
-  const [maxSupply, setMaxSupply] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState(null);
+  // Use ref for latest state to avoid closure issues
+  const transactionStatusRef = useRef(transactionStatus);
+  const unsubscribeRef = useRef(null);
 
-  // Fetch contract data
-  const refetchAll = async () => {
-    setIsLoading(true);
-    setIsError(false);
-    setError(null);
-    try {
-      const [totalSupplyRes, bagPriceRes, maxSupplyRes, contractBalanceRes] =
-        await Promise.all([getTotalSupply(), getBagPrice(), getMaxSupply()]);
+  // Keep ref in sync with state
+  useEffect(() => {
+    transactionStatusRef.current = transactionStatus;
+  }, [transactionStatus]);
 
-      setTotalSupply(totalSupplyRes);
-      setBagPrice(bagPriceRes);
-      setMaxSupply(maxSupplyRes);
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, []);
 
-      if (user?.addr) {
-        const [hasCollectionRes, flowBalanceRes] = await Promise.all([
-          getCheckCollection(user.addr),
+  // Fetch all contract data
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['contract-data', user?.addr],
+    queryFn: async () => {
+      const [totalSupply, bagPrice, maxSupply, contractBalance] =
+        await Promise.all([
+          getTotalSupply(),
+          getBagPrice(),
+          getMaxSupply(),
           getFlowTokenBalance('0x11106fe6700496e8'),
         ]);
 
-        setHasCollection(hasCollectionRes);
-        setContractBalance(flowBalanceRes);
-        setFlowBalance(flowBalanceRes);
-      } else {
-        setHasCollection(false);
-        setFlowBalance(0);
+      let hasCollection = false;
+      let flowBalance = 0;
+      let userNFTCount = 0;
+
+      if (user?.addr) {
+        try {
+          [hasCollection, flowBalance, userNFTCount] = await Promise.all([
+            getCheckCollection(user.addr),
+            getFlowTokenBalance(user.addr),
+            getCollectionLength(user.addr).catch(() => 0), // Return 0 if collection doesn't exist
+          ]);
+        } catch (error) {
+          // Handle case where user doesn't have a collection yet
+          if (error.message.includes('does not have a Bag collection')) {
+            hasCollection = false;
+            userNFTCount = 0;
+          } else {
+            throw error;
+          }
+        }
       }
-    } catch (e) {
-      setIsError(true);
-      setError(e);
-      console.error('Error fetching data:', e);
-    } finally {
-      setIsLoading(false);
+
+      return {
+        totalSupply,
+        bagPrice,
+        maxSupply,
+        contractBalance,
+        hasCollection: Boolean(hasCollection),
+        flowBalance,
+        userNFTCount,
+        maxNFTsReached: userNFTCount >= 20,
+      };
+    },
+    enabled: !!user?.addr,
+    retry: (failureCount, error) => {
+      // Don't retry if it's a "no collection" error
+      if (error.message.includes('does not have a Bag collection')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+
+  // Track transaction
+  const trackTransaction = async (txId) => {
+    try {
+      setTransactionStatus(TRANSACTION_STATUS.PENDING);
+
+      const unsubscribe = fcl.tx(txId).subscribe((transaction) => {
+        // Check if transaction was cancelled using ref for latest value
+        if (transactionStatusRef.current === TRANSACTION_STATUS.CANCELLED) {
+          unsubscribe();
+          return;
+        }
+
+        console.log('Transaction update:', transaction.status, transaction);
+
+        switch (transaction.status) {
+          case 1: // PENDING
+            setTransactionStatus(TRANSACTION_STATUS.PENDING);
+            break;
+          case 2: // FINALIZED
+            setTransactionStatus(TRANSACTION_STATUS.FINALIZED);
+            break;
+          case 3: // EXECUTED
+            setTransactionStatus(TRANSACTION_STATUS.EXECUTED);
+            break;
+          case 4: // SEALED
+            if (transaction.errorMessage) {
+              // Handle user declined transaction specifically
+              if (transaction.errorMessage.toLowerCase().includes('declined')) {
+                setTransactionStatus(TRANSACTION_STATUS.DECLINED);
+                setMintError('Transaction declined by user');
+                toast.error('Transaction was declined');
+              } else {
+                setTransactionStatus(TRANSACTION_STATUS.FAILED);
+                setMintError(transaction.errorMessage);
+                toast.error('Transaction failed');
+              }
+            } else {
+              setTransactionStatus(TRANSACTION_STATUS.SEALED);
+              toast.success('NFTs minted successfully!');
+              queryClient.invalidateQueries(['contract-data']);
+            }
+            unsubscribe();
+            break;
+          case 5: // EXPIRED
+            setTransactionStatus(TRANSACTION_STATUS.FAILED);
+            setMintError('Transaction expired');
+            toast.error('Transaction expired');
+            unsubscribe();
+            break;
+          default:
+            break;
+        }
+      });
+
+      unsubscribeRef.current = unsubscribe;
+    } catch (error) {
+      console.error('Error tracking transaction:', error);
+      setTransactionStatus(TRANSACTION_STATUS.FAILED);
+      setMintError(error.message);
+      toast.error('Error tracking transaction');
     }
   };
 
-  useEffect(() => {
-    refetchAll();
-  }, [user?.addr]);
-
-  const handleMint = async () => {
-    if (!user || !bagPrice) return;
-    setMinting(true);
-    try {
-      const amount = (bagPrice * mintCount).toFixed(2);
-      await mintNFT(user.addr, amount, mintCount);
-      setLastMintedCount(mintCount);
-      setShowSuccess(true);
-      refetchAll();
-      setTimeout(() => setShowSuccess(false), 20000);
-    } catch (e) {
-      const message = parseFlowError(e);
+  // Mint mutation
+  const mintMutation = useMutation({
+    mutationFn: async ({ mintCount }) => {
+      if (!user || !data?.bagPrice)
+        throw new Error('User not connected or price not available');
+      const amount = (data.bagPrice * mintCount).toFixed(2);
+      const transactionId = await mintNFT(user.addr, amount, mintCount);
+      setTransactionSubmitted(true); // Transaction has been submitted to wallet
+      return transactionId;
+    },
+    onMutate: (variables) => {
+      setMintingModalOpen(true);
+      setTransactionStatus(TRANSACTION_STATUS.IDLE);
+      setMintError(null);
+      setTransactionSubmitted(false);
+      setLastMintedCount(variables.mintCount);
+    },
+    onSuccess: (transactionId) => {
+      setTransactionId(transactionId);
+      trackTransaction(transactionId);
+    },
+    onError: (error) => {
+      setTransactionStatus(TRANSACTION_STATUS.FAILED);
+      const message = parseFlowError(error);
+      setMintError(message);
       toast.error(message);
-    } finally {
-      setMinting(false);
+    },
+  });
+
+  const handleMint = (mintCount) => {
+    mintMutation.mutate({ mintCount });
+  };
+
+  const handleCancelMint = () => {
+    // Don't allow cancellation if transaction is already submitted to wallet
+    if (transactionSubmitted) {
+      toast.error('Transaction already submitted. Cannot cancel now.');
+      return;
     }
+
+    if (
+      [TRANSACTION_STATUS.IDLE, TRANSACTION_STATUS.PENDING].includes(
+        transactionStatus
+      )
+    ) {
+      if (
+        window.confirm(
+          'Are you sure you want to cancel? The transaction may still process on the blockchain.'
+        )
+      ) {
+        // Stop tracking the transaction
+        if (unsubscribeRef.current) {
+          unsubscribeRef.current();
+        }
+
+        setMintingModalOpen(false);
+        setTransactionStatus(TRANSACTION_STATUS.CANCELLED);
+        setMintError('Transaction cancelled by user');
+        queryClient.invalidateQueries(['contract-data']);
+      }
+    } else {
+      setMintingModalOpen(false);
+    }
+  };
+
+  const handleRetryMint = (mintCount) => {
+    setMintError(null);
+    setTransactionStatus(TRANSACTION_STATUS.IDLE);
+    setTransactionSubmitted(false);
+    mintMutation.mutate({ mintCount });
+  };
+
+  const handleCloseSuccess = () => {
+    setMintingModalOpen(false);
+    setTransactionStatus(TRANSACTION_STATUS.IDLE);
+    setTransactionId(null);
+    setMintError(null);
+  };
+
+  const getCleanErrorMessage = (error) => {
+    if (!error) return 'Unknown error occurred';
+
+    const message =
+      typeof error === 'object'
+        ? error.message || error.errorMessage || JSON.stringify(error)
+        : String(error);
+
+    // Handle "no collection" error specifically
+    if (message.includes('does not have a Bag collection')) {
+      return "You don't have a collection yet. Minting your first NFT will create one automatically!";
+    }
+
+    const match = message.match(/pre-condition failed: ([^>]+)/);
+    return match && match[1]
+      ? `pre-condition failed: ${match[1].trim()}`
+      : message;
   };
 
   if (isLoading) {
@@ -102,7 +318,7 @@ function Mint() {
 
   if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#12141D]">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md p-6 bg-[#1A1D28] rounded-2xl border border-[#2A2D3A] shadow-lg">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
@@ -122,11 +338,9 @@ function Mint() {
           <h3 className="text-lg font-semibold text-white mb-2">
             Error Loading Data
           </h3>
-          <p className="text-gray-400 mb-4">
-            {error?.message || 'Unknown error occurred'}
-          </p>
+          <p className="text-gray-400 mb-4">{getCleanErrorMessage(error)}</p>
           <button
-            onClick={refetchAll}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
           >
             Try Again
@@ -135,6 +349,17 @@ function Mint() {
       </div>
     );
   }
+
+  const {
+    totalSupply,
+    bagPrice,
+    maxSupply,
+    contractBalance,
+    hasCollection,
+    flowBalance,
+    userNFTCount,
+    maxNFTsReached,
+  } = data || {};
 
   return (
     <main className="min-h-screen px-4 py-8">
@@ -149,9 +374,7 @@ function Mint() {
           </p>
         </div>
 
-        {/* Main Layout */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Sidebar */}
           <div className="w-full lg:w-1/4">
             <Sidebar
               flowBalance={flowBalance}
@@ -159,9 +382,7 @@ function Mint() {
             />
           </div>
 
-          {/* Main Content */}
           <div className="flex-1">
-            {/* Minting Stats Card */}
             <div className="bg-[#1A1D28] rounded-2xl p-6 mb-6 border border-[#2A2D3A] shadow-lg">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-gray-400">Minted:</span>
@@ -185,7 +406,6 @@ function Mint() {
                 minted
               </div>
 
-              {/* View NFTs Button */}
               {user?.addr && hasCollection && (
                 <div className="flex justify-center mt-4">
                   <a
@@ -212,72 +432,31 @@ function Mint() {
               )}
             </div>
 
-            {/* Minting Interface */}
             <MintInterface
-              setMintCount={setMintCount}
-              mintCount={mintCount}
-              minting={minting}
               bagPrice={bagPrice}
-              handleMint={handleMint}
               isWalletConnected={!!user}
-              minMint={1}
-              maxMint={10}
+              userBalance={flowBalance}
+              userNFTCount={userNFTCount}
+              hasCollection={hasCollection}
+              maxNFTsReached={maxNFTsReached}
+              onMint={handleMint}
+              minting={mintMutation.isPending}
             />
 
-            {/* Success Message */}
-            {showSuccess && (
-              <div className="bg-gradient-to-br from-green-900/30 to-teal-900/30 border border-green-700/50 rounded-2xl p-6 mt-6 backdrop-blur-sm">
-                <div className="flex items-center mb-4">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="font-bold text-green-300 text-lg">
-                    Successfully minted {lastMintedCount} NFT
-                    {lastMintedCount > 1 ? 's' : ''}!
-                  </h3>
-                </div>
-                <p className="text-green-200 mb-4">
-                  Your NFT{lastMintedCount > 1 ? 's have' : ' has'} been minted
-                  successfully. You can view{' '}
-                  {lastMintedCount > 1 ? 'them' : 'it'} on FlowView once the
-                  metadata is processed.
-                </p>
-                <a
-                  href={`https://testnet.flowview.app/account/${user?.addr}/collection/GullyBagCollection`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg transition-colors"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  View on FlowView
-                </a>
-              </div>
-            )}
+            <MintingModal
+              isOpen={mintingModalOpen}
+              onClose={handleCancelMint}
+              onRetry={handleRetryMint}
+              transactionStatus={transactionStatus}
+              transactionId={transactionId}
+              error={mintError}
+              mintCount={lastMintedCount}
+              minting={mintMutation.isPending}
+              transactionSubmitted={transactionSubmitted}
+              showSuccess={transactionStatus === TRANSACTION_STATUS.SEALED}
+              onCloseSuccess={handleCloseSuccess}
+            />
 
-            {/* Additional Info */}
             <AdditionalInfo />
           </div>
         </div>
