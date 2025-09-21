@@ -1,13 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { getAllBagLottery } from '../flow/Script/Lottery/get_allLottries.script';
+import { useLotteries } from '../hooks/useLotteries';
+import { useFilteredLotteries } from '../hooks/useFilteredLotteries';
 
 function Lottery() {
-  const [lotteries, setLotteries] = useState([]);
-  const [filteredLotteries, setFilteredLotteries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
     nftId: '',
@@ -15,147 +11,69 @@ function Lottery() {
   });
   const itemsPerPage = 8;
 
-  const fetchLotteries = async () => {
-    setIsLoading(true);
-    setIsError(false);
-    setError(null);
+  // ✅ Get data from React Query - SIMPLE!
+  const {
+    data: allLotteries = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useLotteries();
 
-    try {
-      // Use the actual getAllBagLottery function
-      const response = await getAllBagLottery();
+  // ✅ Get filtered data - EFFICIENT!
+  const filteredLotteries = useFilteredLotteries(allLotteries, filters);
 
-      // Transform the response to match your expected format
-      const transformedLotteries = response.map((lottery) => ({
-        uuid: lottery.uuid || lottery.id,
-        id: lottery.id?.toString() || 'N/A',
-        winner_NFTId: lottery.winnerNFTId?.toString() || '',
-        prizeVault: parseFloat(lottery.winnings || '0'),
-        winnerAddress: lottery.winnerAddress || '',
-        isResolved: lottery.isResolved || false,
-        prizeDistributed: lottery.prizeDistributed || false,
-      }));
+  // Calculate pagination data
+  const totalPages = Math.ceil(filteredLotteries.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedLotteries = filteredLotteries.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
-      // Sort by ID descending (newest first)
-      const sortedLotteries = transformedLotteries.sort((a, b) => {
-        const idA = parseInt(a.id) || 0;
-        const idB = parseInt(b.id) || 0;
-        return idB - idA;
-      });
+  // Calculate total FLOW distributed
+  const totalFlowDistributed = useMemo(
+    () =>
+      allLotteries
+        .filter((lottery) => lottery.prizeDistributed)
+        .reduce((total, lottery) => total + (lottery.prizeVault || 0), 0),
+    [allLotteries]
+  );
 
-      setLotteries(sortedLotteries);
-      setFilteredLotteries(sortedLotteries);
-      setCurrentPage(1); // Reset to first page when data changes
-    } catch (e) {
-      setIsError(true);
-      setError(e);
-      console.error('Error fetching lottery history:', e);
-      toast.error('Failed to load lottery history');
+  // Clear filters
+  const clearFilters = () => {
+    setFilters({ nftId: '', winnerAddress: '' });
+    setCurrentPage(1);
+  };
 
-      // Fallback to mock data if the API call fails (optional)
-      const mockLotteries = [
-        {
-          uuid: '48378511783040',
-          id: '1',
-          winner_NFTId: '7',
-          prizeVault: 1744.2,
-          winnerAddress: '0x6ed8a095ca278bf8',
-          isResolved: true,
-          prizeDistributed: true,
-        },
-        {
-          uuid: '48378511783041',
-          id: '2',
-          winner_NFTId: '45',
-          prizeVault: 180.0,
-          winnerAddress: '0x6373847jdhhf738',
-          isResolved: true,
-          prizeDistributed: true,
-        },
-        {
-          uuid: '48378511783042',
-          id: '3',
-          winner_NFTId: '123',
-          prizeVault: 250.0,
-          winnerAddress: '0x337e140cac71c1f0',
-          isResolved: false,
-          prizeDistributed: false,
-        },
-        {
-          uuid: '48378511783043',
-          id: '4',
-          winner_NFTId: '92',
-          prizeVault: 220.0,
-          winnerAddress: '0x893748274abc123',
-          isResolved: true,
-          prizeDistributed: true,
-        },
-        {
-          uuid: '48378511783044',
-          id: '5',
-          winner_NFTId: '67',
-          prizeVault: 190.0,
-          winnerAddress: '0x6373847jdhhf738',
-          isResolved: true,
-          prizeDistributed: true,
-        },
-        {
-          uuid: '48378511783045',
-          id: '6',
-          winner_NFTId: '81',
-          prizeVault: 210.0,
-          winnerAddress: '0x123456789abcdef',
-          isResolved: true,
-          prizeDistributed: true,
-        },
-        {
-          uuid: '48378511783046',
-          id: '7',
-          winner_NFTId: '104',
-          prizeVault: 230.0,
-          winnerAddress: '0x9876543210fedcba',
-          isResolved: false,
-          prizeDistributed: false,
-        },
-      ];
+  const hasActiveFilters = filters.nftId || filters.winnerAddress;
 
-      const sortedMock = mockLotteries.sort(
-        (a, b) => parseInt(b.id) - parseInt(a.id)
-      );
-      setLotteries(sortedMock);
-      setFilteredLotteries(sortedMock);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  // Apply filters whenever filters or lotteries change
-  useEffect(() => {
-    const filtered = lotteries.filter((lottery) => {
-      // Filter by NFT ID
-      if (filters.nftId && lottery.winner_NFTId !== filters.nftId) {
-        return false;
-      }
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
-      // Filter by winner address
-      if (
-        filters.winnerAddress &&
-        !lottery.winnerAddress
-          ?.toLowerCase()
-          .includes(filters.winnerAddress.toLowerCase())
-      ) {
-        return false;
-      }
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
-      return true;
-    });
-
-    setFilteredLotteries(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [filters, lotteries]);
-
-  useEffect(() => {
-    fetchLotteries();
-  }, []);
+  // Add this with your other helper functions
+  const getPrizeAmount = (lottery) => {
+    return lottery.prizeVault?.toFixed(2) || '0.00';
+  };
 
   const formatAddress = (address) => {
     if (!address) return 'N/A';
@@ -177,63 +95,25 @@ function Lottery() {
     );
   };
 
-  const getPrizeAmount = (lottery) => {
-    return lottery.prizeVault?.toFixed(2) || '0.00';
-  };
+  // Show error if needed
+  if (isError) {
+    toast.error('Failed to load lottery data');
+  }
 
-  const clearFilters = () => {
-    setFilters({
-      nftId: '',
-      winnerAddress: '',
-    });
-  };
-
-  const hasActiveFilters = filters.nftId || filters.winnerAddress;
-
-  // Calculate total FLOW distributed
-  const totalFlowDistributed = lotteries
-    .filter((lottery) => lottery.prizeDistributed)
-    .reduce((total, lottery) => total + (lottery.prizeVault || 0), 0);
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredLotteries.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedLotteries = filteredLotteries.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const goToPage = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  if (isLoading && lotteries.length === 0) {
+  // Loading state
+  if (isLoading && allLotteries.length === 0) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-600">Loading data...</p>
+          <p className="text-gray-600">Loading lottery data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className=" px-6 py-8">
+    <main className="px-6 py-8">
       <div className="max-w-7xl mx-auto bg-black rounded-2xl">
         <div className="px-8 py-10">
           <div className="relative mb-8">
@@ -264,6 +144,30 @@ function Lottery() {
               </div>
             </div>
 
+            {/* NEW: Manual Refresh Button - absolutely positioned on RIGHT */}
+            <div className="absolute top-0 right-0">
+              <button
+                onClick={() => refetch()}
+                className="flex items-center gap-2 px-3 py-1 text-sm text-gray-400 hover:text-white transition-colors border border-gray-600 rounded-lg hover:border-gray-400"
+                title="Refresh data"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Refresh
+              </button>
+            </div>
+
             {/* Title Section */}
             <div className="text-center">
               <h1 className="text-3xl font-bold text-white mb-2">Lottery</h1>
@@ -274,16 +178,17 @@ function Lottery() {
           </div>
 
           {/* Stats Summary */}
+          {/* Stats Summary */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="bg-[#1A1D28] border border-[#2A2D3A] rounded-2xl p-6 text-center shadow-lg">
               <div className="text-2xl font-bold text-blue-400">
-                {lotteries.length}
+                {allLotteries.length}
               </div>
               <div className="text-sm text-gray-400">Total Lotteries</div>
             </div>
             <div className="bg-[#1A1D28] border border-[#2A2D3A] rounded-2xl p-6 text-center shadow-lg">
               <div className="text-2xl font-bold text-green-400">
-                {lotteries.filter((l) => l.isResolved).length}
+                {allLotteries.filter((l) => l.isResolved).length}
               </div>
               <div className="text-sm text-gray-400">Resolved Lotteries</div>
             </div>
