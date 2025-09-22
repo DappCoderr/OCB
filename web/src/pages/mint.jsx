@@ -146,12 +146,12 @@ const ErrorState = ({ error, onRetry }) => (
 
 const Header = () => (
   <div className="text-center ml-44 mb-8">
-    <p className="text-gray-600 max-w-xl mx-auto">
-      It's your shot at{' '}
+    <p className="text-white max-w-xl mx-auto">
+      {/* It's your shot at{' '}
       <span className="text-rose-600 font-semibold animate-pulse">
         13× Richer!
-      </span>
-      <br />A true digital ownership with the power to pay.
+      </span> */}
+      <br />A true digital ownership with the power to pay back.
     </p>
   </div>
 );

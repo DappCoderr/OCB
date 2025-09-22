@@ -25,19 +25,19 @@ const StakingInfo = () => {
       </h3>
 
       <div className="space-y-4">
-        <div className="flex justify-between items-center py-2 px-3 bg-[#232734] rounded-lg">
+        {/* <div className="flex justify-between items-center py-2 px-3 bg-[#232734] rounded-lg">
           <span className="text-gray-300 text-sm">Committed:</span>
-          <span className="font-semibold text-white">0 FLOW</span>
-        </div>
+          <span className="font-semibold text-white">1000 FLOW</span>
+        </div> */}
 
         <div className="flex justify-between items-center py-2 px-3 bg-[#232734] rounded-lg">
           <span className="text-gray-300 text-sm">Staked:</span>
-          <span className="font-semibold text-white">0 FLOW</span>
+          <span className="font-semibold text-white">699930 FLOW</span>
         </div>
 
         <div className="flex justify-between items-center py-2 px-3 bg-[#232734] rounded-lg">
           <span className="text-gray-300 text-sm">Rewarded:</span>
-          <span className="font-semibold text-green-400">0 FLOW</span>
+          <span className="font-semibold text-green-400">1184 FLOW</span>
         </div>
 
         <div className="flex justify-between items-center py-2 px-3 bg-[#232734] rounded-lg">
