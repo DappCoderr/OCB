@@ -154,15 +154,4 @@ MintInterface.propTypes = {
   minting: PropTypes.bool,
 };
 
-MintInterface.defaultProps = {
-  bagPrice: 0,
-  isWalletConnected: false,
-  userBalance: 0,
-  userNFTCount: 0,
-  hasCollection: false,
-  maxNFTsReached: false,
-  onMint: () => {},
-  minting: false,
-};
-
 export default MintInterface;
