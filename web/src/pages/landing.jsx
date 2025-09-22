@@ -1,4 +1,4 @@
-import HeroSection from '../component/section/HeroSection';
+import HeroSection from '../component/Section/HeroSection';
 import FAQSection from '../component/Section/FAQSection';
 import BenefitsSection from '../component/Section/BenefitsSection';
 import HowItWorksSection from '../component/section/HowItWorksSection';
