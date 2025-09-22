@@ -7,9 +7,12 @@ const Footer = () => {
 
   return (
     <div className="mt-16 pt-8 pb-6 text-center border-t border-gray-200/30">
-      <h3 className="font-bold text-lg mb-3 text-gray-800">Still have questions?</h3>
+      <h3 className="font-bold text-lg mb-3 text-gray-800">
+        Still have questions?
+      </h3>
       <p className="text-gray-600 mb-6 max-w-md mx-auto">
-        Join our community discussions or reach out directly. We're here to help!
+        Join our community discussions or reach out directly. We're here to
+        help!
       </p>
 
       <div className="flex justify-center space-x-4">
@@ -18,23 +21,36 @@ const Footer = () => {
           className="p-3 bg-gray-800 text-white rounded-full hover:bg-blue-50 hover:text-blue-500 transition-all duration-200 transform hover:-translate-y-0.5 shadow-sm hover:shadow-md group"
           aria-label="Twitter"
         >
-          <Twitter size={20} className="group-hover:scale-110 transition-transform" />
+          <Twitter
+            size={20}
+            className="group-hover:scale-110 transition-transform"
+          />
         </button>
-        
-        <button 
+
+        <button
           onClick={() => handleExternalLink('https://discord.gg/example')}
           className="p-3 bg-gray-800 text-white rounded-full hover:bg-indigo-50 hover:text-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 shadow-sm hover:shadow-md group"
           aria-label="Discord"
         >
-          <MessageCircle size={20} className="group-hover:scale-110 transition-transform" />
+          <MessageCircle
+            size={20}
+            className="group-hover:scale-110 transition-transform"
+          />
         </button>
-        
+
         <button
-          onClick={() => handleExternalLink('https://contractbrowser.com/A.11106fe6700496e8.Bag')}
+          onClick={() =>
+            handleExternalLink(
+              'https://contractbrowser.com/A.11106fe6700496e8.Bag'
+            )
+          }
           className="p-3 bg-gray-800 text-white rounded-full hover:bg-purple-50 hover:text-purple-500 transition-all duration-200 transform hover:-translate-y-0.5 shadow-sm hover:shadow-md group"
           aria-label="Smart Contract"
         >
-          <FileText size={20} className="group-hover:scale-110 transition-transform" />
+          <FileText
+            size={20}
+            className="group-hover:scale-110 transition-transform"
+          />
         </button>
       </div>
 
