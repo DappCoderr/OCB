@@ -3,6 +3,8 @@ export const LOTTERY_CONTRACT_ADDRESS = 0x337e140cac71c1f0;
 export const FUNGBLE_CONTRACT_ADDRESS = 0x9a0766d93b6608b7;
 export const FLOW_TOKEN = 0x7e60df042a9c0868;
 
+export const ADMIN_ADDRESS = "0x6d9e6334ddad7844"
+
 export const NODE_ID =
   '4afbd63916c3cec5bb75a34d607bcec3c670de952ed1556fa103c680b59b6215';
 export const NODE_TYPE = 'Consensus';

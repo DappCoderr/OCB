@@ -1,8 +1,9 @@
 import { useCurrentFlowUser } from '@onflow/kit';
+import { ADMIN_ADDRESS } from '../utils/constants';
 
 const StakingInfo = () => {
   const { user } = useCurrentFlowUser();
-  const isAdmin = user?.addr === '0x6d9e6334ddad7844';
+  const isAdmin = user?.addr === ADMIN_ADDRESS;
 
   return (
     <div className="bg-gradient-to-br from-[#1A1D28] to-[#1E212E] rounded-2xl p-6 border border-[#2A2D3A] shadow-lg backdrop-blur-sm">
