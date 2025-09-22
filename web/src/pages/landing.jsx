@@ -1,7 +1,7 @@
 import HeroSection from '../component/Section/HeroSection';
 import FAQSection from '../component/Section/FAQSection';
 import BenefitsSection from '../component/Section/BenefitsSection';
-import HowItWorksSection from '../component/section/HowItWorksSection';
+import HowItWorksSection from '../component/Section/HowItWorksSection';
 
 const Landing = () => {
   return (
