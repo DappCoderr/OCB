@@ -1,60 +1,8 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef } from 'react';
-
-const TRANSACTION_STATUS = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  FINALIZED: 'finalized',
-  EXECUTED: 'executed',
-  SEALED: 'sealed',
-  FAILED: 'failed',
-  CANCELLED: 'cancelled',
-  DECLINED: 'declined',
-};
-
-const statusMessages = {
-  [TRANSACTION_STATUS.IDLE]: 'Preparing transaction...',
-  [TRANSACTION_STATUS.PENDING]: 'Transaction submitted to blockchain...',
-  [TRANSACTION_STATUS.FINALIZED]:
-    'Transaction finalized, waiting for execution...',
-  [TRANSACTION_STATUS.EXECUTED]: 'Transaction executed, confirming results...',
-  [TRANSACTION_STATUS.SEALED]: 'Transaction sealed and confirmed!',
-  [TRANSACTION_STATUS.FAILED]: 'Transaction failed',
-  [TRANSACTION_STATUS.CANCELLED]: 'Transaction cancelled',
-  [TRANSACTION_STATUS.DECLINED]: 'Transaction declined',
-};
-
-const getProgressPercentage = (status) => {
-  switch (status) {
-    case TRANSACTION_STATUS.PENDING:
-      return 25;
-    case TRANSACTION_STATUS.FINALIZED:
-      return 50;
-    case TRANSACTION_STATUS.EXECUTED:
-      return 75;
-    case TRANSACTION_STATUS.SEALED:
-      return 100;
-    case TRANSACTION_STATUS.FAILED:
-      return 100;
-    case TRANSACTION_STATUS.CANCELLED:
-      return 100;
-    case TRANSACTION_STATUS.DECLINED:
-      return 25;
-    default:
-      return 2;
-  }
-};
-
-const getCleanErrorMessage = (error) => {
-  if (!error) return '';
-  if (typeof error === 'object' && error.message) return error.message;
-  if (typeof error === 'string') {
-    const match = error.match(/pre-condition failed: ([^>]+)/);
-    if (match && match[1]) return `pre-condition failed: ${match[1].trim()}`;
-    return error;
-  }
-  return 'Transaction failed. Please try again.';
-};
+import { TRANSACTION_STATUS, statusMessages } from '../utils/constants';
+import { getProgressPercentage, getCleanErrorMessage } from '../utils/helper';
+import { fireConfetti } from '../utils/helper';
 
 const MintingModal = ({
   isOpen = false,
@@ -70,8 +18,21 @@ const MintingModal = ({
   onCloseSuccess,
 }) => {
   const modalRef = useRef(null);
+  const hasFiredConfetti = useRef(false);
 
-  // Handle click outside to close
+  useEffect(() => {
+    if (showSuccess && !hasFiredConfetti.current) {
+      fireConfetti();
+      hasFiredConfetti.current = true;
+    }
+  }, [showSuccess]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      hasFiredConfetti.current = false;
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -123,6 +84,7 @@ const MintingModal = ({
           </div>
         )}
 
+        {/* Rest of the modal content remains the same */}
         <h3 className="text-xl font-bold text-white mb-5 flex items-center">
           <svg
             className="w-6 h-6 mr-2 text-blue-400"
@@ -287,15 +249,6 @@ MintingModal.propTypes = {
   transactionSubmitted: PropTypes.bool,
   showSuccess: PropTypes.bool,
   onCloseSuccess: PropTypes.func,
-};
-
-MintingModal.defaultProps = {
-  isOpen: false,
-  transactionStatus: TRANSACTION_STATUS.IDLE,
-  mintCount: 1,
-  minting: false,
-  transactionSubmitted: false,
-  showSuccess: false,
 };
 
 export default MintingModal;
