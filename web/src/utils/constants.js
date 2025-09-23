@@ -40,7 +40,7 @@ export const faqs = [
   {
     question: 'How much does it cost to mint a Bag?',
     answer:
-      'Each Bag costs 60.0 FLOW to mint. After every 1,111 NFTs minted, the mint price will increase by 10.0 FLOW.',
+      'Each Bag costs 60.0 FLOW to mint. After every 555 NFTs minted, the mint price will increase by 10.0 FLOW.',
   },
   {
     question: 'How does the staking amount grow over time?',
@@ -57,11 +57,11 @@ export const faqs = [
     answer:
       'Yes, a 5% royalty fee from all secondary marketplace sales goes to the Bag team, helping sustain the project and community.',
   },
-  {
-    question: 'How does the Bag team earn',
-    answer:
-      'The Bag team has three revenue streams: 5% fee from weekly rewards, 5% royalty cut from secondary sales, 100 Bags reserved for the team, which also receive rewards. These funds are reinvested into development, marketing, and project growth.',
-  },
+  // {
+  //   question: 'How does the Bag team earn',
+  //   answer:
+  //     'The Bag team has three revenue streams: 5% fee from weekly rewards, 5% royalty cut from secondary sales, 100 Bags reserved for the team, which also receive rewards. These funds are reinvested into development, marketing, and project growth.',
+  // },
   {
     question: 'What blockchain is this on?',
     answer:
