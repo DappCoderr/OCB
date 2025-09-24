@@ -1,5 +1,5 @@
 const WITHDRAW_REWARD = `
-import FlowStakingCollection from 
+import FlowStakingCollection from 0xFlowStakingCollection
 
 /// Request to withdraw rewarded tokens for the specified node or delegator in the staking collection
 /// The tokens are automatically deposited to the unlocked account vault first,
