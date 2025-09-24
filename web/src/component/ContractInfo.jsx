@@ -4,7 +4,7 @@ const ContractInfo = ({ contractBalance }) => {
   return (
     <div className="bg-[#1A1D28] rounded-2xl p-6 border border-[#2A2D3A] shadow-lg">
       <h3 className="font-semibold text-white mb-4 text-lg flex items-center">
-        Bag Contract Balance
+        Bag Vault
       </h3>
 
       <div className="space-y-4">
