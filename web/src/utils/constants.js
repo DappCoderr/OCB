@@ -35,46 +35,66 @@ export const faqs = [
   {
     question: 'What is OCB?',
     answer:
-      "Bag (OCB) is a fully on-chain GameFi asset, powered by Flow VRF randomness to ensure complete fairness. Each Bag contains 7 unique traits, forming a one-of-a-kind warrior identity. Bag is not just about art — every mint amount is staked into Flow nodes, generating real yield that flows back to holders. It's identity, utility, and rewards, all packed into a single Bag.",
+      'Bag (OCB) is a yield-bearing, fully on-chain GameFi NFT powered by Flow VRF. Unlike typical NFT art, Bag is a financial NFT — its mint price is staked to generate real yield, which flows back to holders. Identity, utility, and rewards — all packed into a single Bag.',
   },
   {
     question: 'How much does it cost to mint a Bag?',
     answer:
-      'Each Bag costs 60.0 FLOW to mint. After every 555 NFTs minted, the mint price will increase by 10.0 FLOW.',
+      'Each Bag starts at 60 FLOW to mint. The price follows a stepwise linear bonding curve, increasing by 10 FLOW after every 555 NFTs are minted.',
   },
   {
     question: 'How does the staking amount grow over time?',
     answer:
-      'Each week, 15% of the staking reward is automatically restaked (compounded). This increases the total stake, allowing the future weekly rewards to grow continuously.',
+      '15% of all staking rewards are automatically restaked (compounded). This grows the total stake, so future weekly rewards increase continuously.',
   },
   {
     question: 'What makes this project different?',
     answer:
-      'Unlike typical NFTs with zero utility. Bag gives you weekly reward. Redeem an avatar from your Bag to play in the upcoming game. Future Bag token airdrops may reward holders. Bag isn’t just art — it’s identity, utility, and rewards all in one.',
+      'Unlike typical NFT projects with zero utility, Bag (OCB) combines real yield generation with playable GameFi mechanics, powered by provably fair, fully on-chain systems — offering identity, rewards, and gameplay in a single NFT.',
   },
   {
     question: 'Are there royalties on secondary sales?',
     answer:
-      'Yes, a 5% royalty fee from all secondary marketplace sales goes to the Bag team, helping sustain the project and community.',
+      'Yes, a 5% royalty fee from all secondary marketplace sales goes to the Bag team, helping sustain the project and grow the community.',
   },
-  // {
-  //   question: 'How does the Bag team earn',
-  //   answer:
-  //     'The Bag team has three revenue streams: 5% fee from weekly rewards, 5% royalty cut from secondary sales, 100 Bags reserved for the team, which also receive rewards. These funds are reinvested into development, marketing, and project growth.',
-  // },
   {
     question: 'What blockchain is this on?',
     answer:
-      'Bag is built on Flow mainnet, ensuring maximum compatibility and decentralization.',
+      'Bag is built on the Flow mainnet, ensuring scalability, composability, and decentralization.',
   },
   {
     question: 'How does staking work?',
     answer:
-      'When a user mints a Bag, the mint amount is staked into Flow validator node. The staking generates weekly rewards, which are then distributed to one lucky holder through a Bag Lottery smart contract. This creates a game of chance where every Bag you hold gives you a shot at winning the weekly reward',
+      'When you mint a Bag, your mint price is staked into Flow nodes, generating 8% APY. Weekly rewards are distributed through a provably fair lottery.',
   },
   {
-    question: 'Is there a roadmap?',
+    question: 'How do Bag Lottery rewards work?',
     answer:
-      'We intentionally avoid traditional roadmaps with unrealistic promises. Our focus is on building a sustainable collection that stands the test of time.',
+      'Each week, staking rewards are pooled and distributed to one Bag holders through a provably fair lottery powered by Flow VRF. This gives every holder a chance to win while ensuring total randomness and transparency.',
+  },
+  {
+    question: 'What happens if I sell my Bag?',
+    answer:
+      'When you sell your Bag on the marketplace, the new owner inherits its staking rewards and win count. The NFT carries its full financial and gameplay history.',
+  },
+  {
+    question: 'Can I redeem my Bag for a playable avatar?',
+    answer:
+      'Yes! In future phases, you can redeem your Bag into a playable avatar with 7 unique traits. These traits will also be tradable individually.',
+  },
+  {
+    question: 'How many Bags are there?',
+    answer:
+      'There are a total of 7,777 Bags. Each Bag is 100% unique and fully on-chain, generated via Flow VRF to ensure no duplicates.',
+  },
+  {
+    question: 'How do you ensure fairness and security?',
+    answer:
+      'All randomness comes from Flow VRF, and for staking, we use the Flow core smart contract to stake tokens into the Flow node, ensuring provable fairness with full composability. Smart contracts are fully on-chain, transparent, and audited for safety.',
+  },
+  {
+    question: 'How will gameplay work?',
+    answer:
+      'Bag holders can compete in future games using their avatars. By playing, you can earn XP, climb leaderboards, and win additional rewards.',
   },
 ];
