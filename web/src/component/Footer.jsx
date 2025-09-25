@@ -1,4 +1,4 @@
-import { Twitter, Mail, FileText, MessageCircle } from 'lucide-react';
+import { Twitter, Mail, FileText } from 'lucide-react';
 
 const Footer = () => {
   const handleExternalLink = (url) => {
@@ -28,11 +28,13 @@ const Footer = () => {
         </button>
 
         <button
-          onClick={() => handleExternalLink('https://discord.gg/example')}
+          onClick={() =>
+            (window.location.href = 'mailto:support@onchainbag.xyz')
+          }
           className="p-3 bg-gray-800 text-white rounded-full hover:bg-indigo-50 hover:text-indigo-500 transition-all duration-200 transform hover:-translate-y-0.5 shadow-sm hover:shadow-md group"
-          aria-label="Discord"
+          aria-label="Email Support"
         >
-          <MessageCircle
+          <Mail
             size={20}
             className="group-hover:scale-110 transition-transform"
           />
