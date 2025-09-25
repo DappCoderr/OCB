@@ -104,9 +104,9 @@ const BenefitsSection = () => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
-              Community Growth
+              Flow Network
             </h3>
-            <p className="text-gray-600">Supports Flow Network</p>
+            <p className="text-gray-600">Supports Community Growth</p>
           </div>
         </div>
       </div>

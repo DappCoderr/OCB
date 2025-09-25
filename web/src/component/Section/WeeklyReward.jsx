@@ -157,7 +157,7 @@ const WeeklyReward = () => {
           <div className="text-xs text-gray-500">NFTs Minted</div>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-emerald-600">8-9%</div>
+          <div className="text-2xl font-bold text-emerald-600">8%</div>
           <div className="text-xs text-gray-500">APY</div>
         </div>
       </div>
