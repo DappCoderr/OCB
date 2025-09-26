@@ -289,13 +289,6 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
             
             return <- newNFT
         }
-
-        // Admin function to manually update price if needed
-        access(all) fun updateMintPrice(newPrice: UFix64) {            
-            let oldPrice = Bag.mintPrice
-            Bag.mintPrice = newPrice
-            emit PriceUpdated(oldPrice: oldPrice, newPrice: newPrice)
-        }
     }
 
     access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
@@ -651,7 +644,7 @@ access(all) contract Bag: NonFungibleToken, ViewResolver {
 
         // After each interval, mint price will increase by 10.0 Flow
         // Giving benefit to early holders
-        self.priceUpdateInterval = 1111
+        self.priceUpdateInterval = 555
         self.priceIncreaseAmount = 10.0
 
         self.CollectionStoragePath = /storage/BagCollections

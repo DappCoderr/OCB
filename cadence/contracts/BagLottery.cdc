@@ -65,7 +65,7 @@ access(all) contract BagLottery {
             emit PrizePoolFunded(amount: fundedAmount)
         }
 
-        access(all) fun resolveLottery(lotteryID: UInt64, owner:Address) {
+        access(all) fun resolveLottery(lotteryID: UInt64) {
             let totalPrize = BagLottery.getLotteryVaultBalance()
             assert(totalPrize > 0.0, message: "Prize pool is empty")
 
@@ -85,27 +85,19 @@ access(all) contract BagLottery {
             let registryRef = getAccount(registerAddress).contracts.borrow<&BagRegistry>(name: "BagRegistry") ?? panic("")
             let winnerAddress = registryRef.getHolder(bagId: winner_NFT_Id)!
 
-            // Distribute prizes: 95% and 5%.
-            // Bag Team 5% for development + marketing
-            let bagTeamAmount = totalPrize * BagLottery.teamShare
-            let bagTeamVault <- BagLottery.lotteryVault.withdraw(amount: bagTeamAmount)
-            let bagTeamReceiver =  BagLottery.getFlowTokenReceiver(user:owner)
-            bagTeamReceiver.deposit(from: <- bagTeamVault)
-
-            // Winner         
-            let remainingAmount = BagLottery.getLotteryVaultBalance()
-            let winnerAmount = remainingAmount
-            let winnerVault <- BagLottery.lotteryVault.withdraw(amount: winnerAmount) 
+            // Winner 
+            // 100% prizes is distributed to one Bag holder        
+            let winnerVault <- BagLottery.lotteryVault.withdraw(amount: totalPrize) 
             let winnerReceiver = BagLottery.getFlowTokenReceiver(user:winnerAddress)          
             winnerReceiver.deposit(from: <- winnerVault)
 
             let bag = Bag.borrowNFT(ownerAddress: winnerAddress, nftId: winner_NFT_Id)
             bag.incrementWinCount()
             
-            lotteryRef.updateLotteryDetails(nftId: winner_NFT_Id, address: winnerAddress, amount:winnerAmount)
+            lotteryRef.updateLotteryDetails(nftId: winner_NFT_Id, address: winnerAddress, amount:totalPrize)
             lotteryRef.markAsResolved()
 
-            emit LotteryResolvedAndPrizeDistributed(lotteryID: lotteryID, nftId: winner_NFT_Id, winnerAddress: winnerAddress, amount: winnerAmount)
+            emit LotteryResolvedAndPrizeDistributed(lotteryID: lotteryID, nftId: winner_NFT_Id, winnerAddress: winnerAddress, amount: totalPrize)
         }
 
         access(all) fun borrowLottery(lotteryID: UInt64): &Lottery? {
