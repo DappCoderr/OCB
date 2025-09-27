@@ -1,4 +1,4 @@
-import FlowStakingCollection from 0x8d0e87b65159ae63
+import FlowStakingCollection from "../../contracts/FlowStakingCollection.cdc"
 
 
 access(all) fun main(address: Address): [FlowStakingCollection.DelegatorIDs] {

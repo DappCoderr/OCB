@@ -1,5 +1,5 @@
-import FlowStakingCollection from 0x95e019a17d0e23d7
-import FlowIDTableStaking from 0x9eca2b38b18b5dfe
+import FlowStakingCollection from "../../contracts/FlowStakingCollection.cdc"
+import FlowIDTableStaking from "../../contracts/FlowIDTableStaking.cdc"
 
 /// Gets an array of all the delegator metadata for delegators stored in the staking collection
 
