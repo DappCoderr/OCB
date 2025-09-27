@@ -1,4 +1,4 @@
-import FlowStakingCollection from 0x95e019a17d0e23d7
+import FlowStakingCollection from "../../contracts/interface/FlowStakingCollection.cdc"
 
 /// Requests unstaking for the specified node or delegator in the staking collection
 

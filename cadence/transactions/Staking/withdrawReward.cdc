@@ -1,6 +1,7 @@
-// import FlowStakingCollection from 0x95e019a17d0e23d7
-import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
 import FlowToken from "../../contracts/interface/FlowToken.cdc"
+import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
+import FlowStakingCollection from "../../contracts/interface/FlowStakingCollection.cdc"
+
 import BagLottery from "../../contracts/BagLottery.cdc"
 import BagDistributionRatio from "../../contracts/BagDistributionRatio.cdc"
 
