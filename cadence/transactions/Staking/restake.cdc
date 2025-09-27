@@ -1,17 +1,17 @@
-// import FlowStakingCollection from 0x8d0e87b65159ae63
+import FlowStakingCollection from 0x95e019a17d0e23d7
 
-// /// Commits rewarded tokens to stake for the specified node or delegator in the staking collection
+/// Commits rewarded tokens to stake for the specified node or delegator in the staking collection
 
-// transaction(nodeID: String, delegatorID: UInt32?, amount: UFix64) {
+transaction(nodeID: String, delegatorID: UInt32?, amount: UFix64) {
     
-//     let stakingCollectionRef: auth(FlowStakingCollection.CollectionOwner) &FlowStakingCollection.StakingCollection
+    let stakingCollectionRef: auth(FlowStakingCollection.CollectionOwner) &FlowStakingCollection.StakingCollection
 
-//     prepare(account: auth(BorrowValue) &Account) {
-//         self.stakingCollectionRef = account.storage.borrow<auth(FlowStakingCollection.CollectionOwner) &FlowStakingCollection.StakingCollection>(from: FlowStakingCollection.StakingCollectionStoragePath)
-//             ?? panic("Could not borrow a reference to a StakingCollection in the primary user's account")
-//     }
+    prepare(account: auth(BorrowValue) &Account) {
+        self.stakingCollectionRef = account.storage.borrow<auth(FlowStakingCollection.CollectionOwner) &FlowStakingCollection.StakingCollection>(from: FlowStakingCollection.StakingCollectionStoragePath)
+            ?? panic("Could not borrow a reference to a StakingCollection in the primary user's account")
+    }
 
-//     execute {
-//         self.stakingCollectionRef.stakeRewardedTokens(nodeID: nodeID, delegatorID: delegatorID, amount: amount)
-//     }
-// }
+    execute {
+        self.stakingCollectionRef.stakeRewardedTokens(nodeID: nodeID, delegatorID: delegatorID, amount: amount)
+    }
+}
