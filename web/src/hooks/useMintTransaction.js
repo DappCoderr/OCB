@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as fcl from '@onflow/fcl';
 import { useCurrentFlowUser } from '@onflow/kit';
 import toast from 'react-hot-toast';
-import { mintNFT } from '../flow/Transaction/MintBag.tx';
+import { mintNFT } from '../flow/Transaction/bag/mint_bag.tx';
 import { parseFlowError } from '../utils/parseFlowError';
 import { TRANSACTION_STATUS } from '../utils/constants';
 
