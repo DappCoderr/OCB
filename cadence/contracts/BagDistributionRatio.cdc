@@ -1,5 +1,5 @@
-import FlowStakingCollection from "./interface/FlowStakingCollection.cdc"
 import FlowIDTableStaking from "./interface/FlowIDTableStaking.cdc"
+import FlowStakingCollection from "./interface/FlowStakingCollection.cdc"
 
 access(all) contract BagDistributionRatio {
     
