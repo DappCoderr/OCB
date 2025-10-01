@@ -1,4 +1,4 @@
-import FlowEpoch from "../../contracts/FlowEpoch.cdc"
+import FlowEpoch from "../../contracts/interface/FlowEpoch.cdc"
 
 access(all) fun main(targetEpoch: UInt64): UInt64 {
     pre {
