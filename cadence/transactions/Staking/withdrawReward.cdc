@@ -1,15 +1,14 @@
 import FlowToken from "../../contracts/interface/FlowToken.cdc"
 import FungibleToken from "../../contracts/interface/FungibleToken.cdc"
-import FlowStakingCollection from "../../contracts/interface/FlowStakingCollection.cdc"
-
-import BagLottery from "../../contracts/BagLottery.cdc"
-import BagDistributionRatio from "../../contracts/BagDistributionRatio.cdc"
+import BagLottery from 0x11106fe6700496e8
+import BagDistributionRatio from 0x11106fe6700496e8
+import FlowStakingCollection from 0x95e019a17d0e23d7
 
 /// Request to withdraw rewarded tokens for the specified node or delegator in the staking collection
 /// The tokens are automatically deposited to the unlocked account vault first,
 /// And then any locked tokens are deposited into the locked account vault
 
-transaction(nodeID: String, delegatorID: UInt64?, amount: UFix64, bagTeam: Address) {
+transaction(nodeID: String, delegatorID: UInt32, amount: UFix64, bagTeam: Address) {
     
     let stakingCollectionRef: auth(FlowStakingCollection.CollectionOwner) &FlowStakingCollection.StakingCollection
 
