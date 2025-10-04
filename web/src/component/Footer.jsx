@@ -6,7 +6,7 @@ const Footer = () => {
   };
 
   return (
-    <div className="mt-16 pt-8 pb-6 text-center border-t border-gray-200/30">
+    <div className="mt-16 pt-8 pb-6 text-center border-gray-200/30">
       <h3 className="font-bold text-lg mb-3 text-gray-800">
         Still have questions?
       </h3>
