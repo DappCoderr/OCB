@@ -3,10 +3,10 @@ import FlowToken from "../../contracts/interface/FlowToken.cdc"
 import BagLottery from "../../contracts/BagLottery.cdc"
 
 /// Transaction: FundPrizePoolCreateAndResolveLottery
-/// Description: Funds the prize pool, creates a new lottery, and immediately resolves it
-transaction(amount: UFix64, owner: Address) {
+/// Description: Creates a new lottery, Funds the prize pool and immediately resolves it
+transaction() {
 
-    let prizeContributionVault: @{FungibleToken.Vault}
+    // let prizeContributionVault: @{FungibleToken.Vault}
     let adminReference: &BagLottery.Admin
     var newLotteryId: UInt64
 
@@ -23,7 +23,7 @@ transaction(amount: UFix64, owner: Address) {
         )
 
         // Verify the signer has sufficient balance for the contribution
-        assert(signerVaultRef.balance >= amount, message: "Insufficient FLOW balance. ".concat("Required: ").concat(amount.toString()).concat(", Available: ").concat(signerVaultRef.balance.toString()))
+        // assert(signerVaultRef.balance >= amount, message: "Insufficient FLOW balance. ".concat("Required: ").concat(amount.toString()).concat(", Available: ").concat(signerVaultRef.balance.toString()))
 
         // Borrow reference to the BagLottery Admin resource
         self.adminReference = signer.storage.borrow<&BagLottery.Admin>(from: BagLottery.AdminStoragePath) ?? panic(
@@ -31,23 +31,18 @@ transaction(amount: UFix64, owner: Address) {
             .concat("Path: ").concat(BagLottery.AdminStoragePath.toString())
             .concat(". Signer must have Admin privileges.")
         )
-
-        // Withdraw the specified amount from signer's vault
-        self.prizeContributionVault <- signerVaultRef.withdraw(amount: amount)
     }
 
     execute {
-        // Step 1: Fund the prize pool with the contributed amount
-        self.adminReference.fundPrizePool(amount: <- self.prizeContributionVault)
         
-        // Verify the prize pool was successfully funded
+        // Verify the prize pool has the Reward
         let prizePoolBalance = BagLottery.getLotteryVaultBalance()
         assert(
             prizePoolBalance > 0.0,
             message: "Prize pool funding failed. ".concat("Expected: > 0.0, Actual: ").concat(prizePoolBalance.toString())
         )
 
-        // Step 2: Create a new lottery
+        // Create a new lottery
         self.adminReference.createLottery()
         
         // Retrieve and validate the new lottery ID
@@ -59,8 +54,8 @@ transaction(amount: UFix64, owner: Address) {
                     .concat(", Actual total: ").concat(BagLottery.totalLottery.toString())
         )
 
-        // Step 3: Resolve the newly created lottery
-        self.adminReference.resolveLottery(lotteryID: self.newLotteryId, owner: owner)
+        // Resolve the newly created lottery
+        self.adminReference.resolveLottery(lotteryID: self.newLotteryId)
     }
 
     post {
